@@ -1,0 +1,24 @@
+{
+  "name": "chat",
+  "version": "0.0.0",
+  "homepage": "https://github.com/Nayigiziki/examples",
+  "authors": [
+    "Nayigiziki <josephnayigiziki@gmail.com>"
+  ],
+  "main": "index.html",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components"
+  ],
+  "dependencies": {
+    "materialize": "~0.96.1",
+    "moment": "~2.10.3",
+    "angular": "~1.4.0",
+    "firebase": "~2.2.6",
+    "angularfire": "~1.1.1",
+    "angular-scroll-glue": "~2.0.5",
+    "angular-ui-router": "~0.2.15"
+  }
+}

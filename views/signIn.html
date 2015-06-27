@@ -1,0 +1,10 @@
+<div id="signInView" ng-controller="SignInCtrl">
+  <div><strong>sign in</strong></div>
+  <div ng-show="error">{{error}}</div>
+  <form id="signInUser" autocomplete="on" ng-submit="signIn(signInEmail, signInPassword)">
+    <input type="email" ng-model="signInEmail" class="input" placeholder="email" autofocus autocomplete="on"/>
+    <input type="password" ng-model="signInPassword" class="input" placeholder="password"/>
+    <button class="waves-effect  blue-grey lighten-3 btn">sign in</button>
+  </form>
+  <a id="linkToRegister" href="#" class="waves-effect  blue-grey lighten-3 btn" ng-click="goToRegister()">sign up</a>
+</div>
