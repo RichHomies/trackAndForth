@@ -1,3 +1,5 @@
+
+
 var app = angular.module("chatApp", ["firebase", "luegg.directives", 'ui.router'])
 
 .config(function($stateProvider, $urlRouterProvider){
@@ -24,7 +26,11 @@ var app = angular.module("chatApp", ["firebase", "luegg.directives", 'ui.router'
     controller : "ChatCtrl"
   });
 })
+.run(function(){
+  chrome.browserAction.setIcon({path:"assets/diamond.png"});
 
+
+})
 .factory('User', function ($state) {
   var ref = new Firebase("https://chromechatapp.firebaseio.com/chat");
   var userRef = new Firebase('https://chromechatapp.firebaseio.com/usersInfo');
@@ -40,7 +46,6 @@ var app = angular.module("chatApp", ["firebase", "luegg.directives", 'ui.router'
   }
 
   var setAuthObj = function(obj){
-    console.log(obj);
     authDataObj = obj;
   }
 
@@ -49,7 +54,6 @@ var app = angular.module("chatApp", ["firebase", "luegg.directives", 'ui.router'
   }
   //pick up from up here
   var saveUserObjToFirebase = function() {
-    console.log(authDataObj);
     userRef.child(authDataObj.uid).set(name);
   };
 
@@ -62,10 +66,19 @@ var app = angular.module("chatApp", ["firebase", "luegg.directives", 'ui.router'
   };
 
   var unauth = function(){
-   userRef.unauth();
+   ref.unauth();
  };
 
- var registerUser = function(username, password, cb) {
+ var isAuth = function(){
+  var obj = ref.getAuth();
+  if(obj === null){
+    return false;
+  } else {
+    return obj;
+  }
+};
+
+var registerUser = function(username, password, cb) {
   ref.createUser({
     email: username,
     password: password
@@ -83,6 +96,8 @@ var signIn = function(username, password, cb) {
   });
 };
 
+
+
 return {
   saveUserObjToFirebase : saveUserObjToFirebase,
   fetchUserObjFromFirebase : fetchUserObjFromFirebase,
@@ -93,7 +108,8 @@ return {
   getName : getName,
   setAuthObj : setAuthObj,
   getAuthObj : getAuthObj,
-  ref : ref
+  ref : ref,
+  isAuth : isAuth
 };
 
 })
@@ -102,7 +118,6 @@ return {
   // we pass our new chatMessages factory into the controller
   function($scope, $firebaseArray, User, $state) {
     $scope.messages = $firebaseArray(User.ref);
-
 
     User.fetchUserObjFromFirebase(function(nameString){
       User.setName(nameString);
@@ -118,6 +133,8 @@ return {
       // calling $add on a synchronized array is like Array.push(),
       // except that it saves the changes to our Firebase database!
       var ts = new Date();
+      ts = ts.toString();
+      
       User.ref.push({
         name: $scope.name, 
         text: $scope.messageText, 
@@ -130,15 +147,23 @@ return {
       var ts = moment(dateString).fromNow();
       return ts;
     };
+
     $scope.logOff = function(){
       $state.go('signIn');
       User.setAuthObj(null);
       User.setName(null);
+      User.unauth();
     }
   }])
 
 .controller("RegisterCtrl", ["$scope", "$firebaseArray", "$state", "User",
   function($scope, $firebaseArray, $state, User){
+    var userIsLoggedIn = User.isAuth();
+    if(userIsLoggedIn){
+      User.setAuthObj(userIsLoggedIn);
+      $state.go('messages');
+    }
+
     $scope.registerUser = function(username, password) {
       $scope.registerEmail = '';
       $scope.registerPassword = '';
@@ -151,9 +176,9 @@ return {
           console.log("registered user");
           User.signIn(username, password, function(error, authDataFb) {
             if (error) {
-            console.log("Login Failed!", error);
-            $scope.error = error.message;
-            $scope.$apply();
+              console.log("Login Failed!", error);
+              $scope.error = error.message;
+              $scope.$apply();
             } else {
               User.setAuthObj(authDataFb);
               console.log('registerCtrl ' + User.getAuthObj().toString());
