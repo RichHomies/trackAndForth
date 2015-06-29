@@ -39,6 +39,7 @@ var app = angular.module("chatApp", ["firebase", "luegg.directives", 'ui.router'
 
   var setName = function(nameStr){
     name = nameStr;
+    chrome.extension.getBackgroundPage().nameString = nameStr;
   }
 
   var getName = function(){
@@ -67,6 +68,7 @@ var app = angular.module("chatApp", ["firebase", "luegg.directives", 'ui.router'
 
   var unauth = function(){
    ref.unauth();
+   chrome.extension.getBackgroundPage().nameString = '';
  };
 
  var isAuth = function(){
@@ -95,8 +97,6 @@ var signIn = function(username, password, cb) {
     cb(error, authData);
   });
 };
-
-
 
 return {
   saveUserObjToFirebase : saveUserObjToFirebase,

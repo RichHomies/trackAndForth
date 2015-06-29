@@ -64,6 +64,9 @@ em {
   display:block;
 }
 
+
+
+
 #nameView, #registerView, #messageView, #signInView {
   display: visible;
   padding-bottom: 10px;

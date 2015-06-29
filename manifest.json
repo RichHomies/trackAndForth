@@ -14,7 +14,8 @@
     "https://ajax.googleapis.com/", 
     "storage", 
     "notifications",
-    "background"
+    "background",
+    "contextMenus"
     ],
     "background": {
       "page": "background.html",
