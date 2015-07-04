@@ -1,6 +1,6 @@
 
 
-var app = angular.module("chatApp", ["firebase", "luegg.directives", 'ui.router'])
+var app = angular.module("chatApp", ["firebase", "luegg.directives", 'ui.router', 'ngSanitize'])
 
 .config(function($stateProvider, $urlRouterProvider){
   // For any unmatched url, send to /route1
@@ -34,6 +34,8 @@ var app = angular.module("chatApp", ["firebase", "luegg.directives", 'ui.router'
 .factory('User', function ($state) {
   var ref = new Firebase("https://chromechatapp.firebaseio.com/chat");
   var userRef = new Firebase('https://chromechatapp.firebaseio.com/usersInfo');
+  var youTubeRef = new Firebase("https://chromechatapp.firebaseio.com/youtube");
+  
   var authDataObj;
   var name;
 
@@ -109,15 +111,17 @@ return {
   setAuthObj : setAuthObj,
   getAuthObj : getAuthObj,
   ref : ref,
-  isAuth : isAuth
+  isAuth : isAuth,
+  youTubeRef: youTubeRef
 };
 
 })
 
-.controller("ChatCtrl", ["$scope", "$firebaseArray", "User", "$state",
+.controller("ChatCtrl", ["$scope", "$firebaseArray", "User", "$state", "$sce",
   // we pass our new chatMessages factory into the controller
-  function($scope, $firebaseArray, User, $state) {
+  function($scope, $firebaseArray, User, $state, $sce) {
     $scope.messages = $firebaseArray(User.ref);
+    $scope.youtubeLinks =  $firebaseArray(User.youTubeRef);
 
     User.fetchUserObjFromFirebase(function(nameString){
       User.setName(nameString);
@@ -125,6 +129,11 @@ return {
       $scope.$apply();  
     });
     
+    $scope.trustSrc = function(src) {
+      return $sce.trustAsResourceUrl("https://www.youtube.com/embed/" + src);
+    };
+
+
     $scope.$on('LastRepeaterElement', function(){
       console.log('good to go');
     });

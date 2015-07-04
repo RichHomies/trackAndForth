@@ -6,14 +6,17 @@
     </div>
   </div>
   <form ng-submit="addMessage()">
-    <label for="email">Email</label>
     <input type="text" id="messageInput" placeholder="Message..." ng-submit="addMessage()" ng-model="messageText"/>
-
   </form>
-
-
-  
   <br><a href='#' id='logOff' class="waves-effect  blue-grey lighten-3 btn" ng-click="logOff()" >log off</a>
-</div>
+
 
 <!-- ng-class="{right: message.name === name}" -->
+
+<hr>
+  <div>Youtube</div>
+  <div ng-repeat="youtube in youtubeLinks"> <div>{{youtube.name}}</div>
+     <iframe width="90%" height="315" ng-src="{{trustSrc(youtube.text)}}"  frameborder="0" allowfullscreen ></iframe> 
+  </div>
+
+</div>
