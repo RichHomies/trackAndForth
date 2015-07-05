@@ -1,22 +1,24 @@
 <div ng-controller="ChatCtrl">
   <span >{{name}}</span>
   <div id="messagesDiv" width="100%" scroll-glue="!glued">
-    {{message.timeStamp}}
-    <div ng-repeat="message in messages | orderBy: reverse" emit-last-repeater-element>{{message.name}} - {{message.text}}
+    <div display="block" ng-repeat="message in messages | orderBy: reverse" emit-last-repeater-element>
+    <div><span ng-if="message.name !== name"><strong>{{message.name}}</strong> : </span> {{message.text}}</div>
     </div>
   </div>
   <form ng-submit="addMessage()">
     <input type="text" id="messageInput" placeholder="Message..." ng-submit="addMessage()" ng-model="messageText"/>
   </form>
-  <br><a href='#' id='logOff' class="waves-effect  blue-grey lighten-3 btn" ng-click="logOff()" >log off</a>
+  <br>
 
-
-<!-- ng-class="{right: message.name === name}" -->
+  <button class="btn waves-effect waves-light" type="submit" ng-click="logOff()">log off
+    <i class="material-icons"></i>
+  </button>
 
 <hr>
-  <div>Youtube</div>
-  <div ng-repeat="youtube in youtubeLinks"> <div>{{youtube.name}}</div>
-     <iframe width="90%" height="315" ng-src="{{trustSrc(youtube.text)}}"  frameborder="0" allowfullscreen ></iframe> 
+Youtube
+  <div id="youTube">
+    <div ng-repeat="youtube in youtubeLinks"> <div>{{youtube.name}}</div>
+       <iframe width="90%" height="315" ng-src="{{trustSrc(youtube.text)}}"  frameborder="0" allowfullscreen ></iframe> 
+    </div>
   </div>
-
 </div>

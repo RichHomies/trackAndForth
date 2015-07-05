@@ -1,10 +1,13 @@
-<div id="registerView" ng-controller="RegisterCtrl">
-  <div><strong>sign up</strong></div>
+<div id="registerView" ng-controller="RegisterCtrl" class="container">
+  <div>sign up, and enjoy</div>
   <div ng-show="error">{{error}}</div>
   <form autocomplete="on" ng-submit="registerUser(registerEmail, registerPassword)">
     <input type="email" ng-model="registerEmail" placeholder="email" autofocus autocomplete="on"/>
     <input type="password" ng-model="registerPassword" placeholder="password"/>
-    <button type="submit" class="waves-effect   blue-grey lighten-3 btn">sign up</button>
+    <button class="btn waves-effect waves-light" type="submit" name="action">Submit
+      <i class="material-icons"></i>
+    </button>
   </form >
-  <a id="linkToSign" href="#" class="waves-effect  blue-grey lighten-3 btn" ng-click="goToSignIn()">sign in</a>
-</div>  
+  <a id="linkToSign" href="#" class="waves-effect waves-teal btn-flat" ng-click="goToSignIn()">sign in</a>
+</div> 
+

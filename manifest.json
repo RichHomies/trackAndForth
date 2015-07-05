@@ -20,5 +20,8 @@
     "background": {
       "page": "background.html",
       "persistent": true
-    }
+    },
+    "icons": {
+          "16": "assets/diamond.png"
+        }
 }

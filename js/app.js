@@ -4,7 +4,7 @@ var app = angular.module("chatApp", ["firebase", "luegg.directives", 'ui.router'
 
 .config(function($stateProvider, $urlRouterProvider){
   // For any unmatched url, send to /route1
-  $urlRouterProvider.otherwise("/");
+  $urlRouterProvider.otherwise("/signIn");
 
   $stateProvider
   .state('home', {
@@ -28,8 +28,6 @@ var app = angular.module("chatApp", ["firebase", "luegg.directives", 'ui.router'
 })
 .run(function(){
   chrome.browserAction.setIcon({path:"assets/diamond.png"});
-
-
 })
 .factory('User', function ($state) {
   var ref = new Firebase("https://chromechatapp.firebaseio.com/chat");
@@ -122,6 +120,7 @@ return {
   function($scope, $firebaseArray, User, $state, $sce) {
     $scope.messages = $firebaseArray(User.ref);
     $scope.youtubeLinks =  $firebaseArray(User.youTubeRef);
+    $scope.name;
 
     User.fetchUserObjFromFirebase(function(nameString){
       User.setName(nameString);
@@ -137,6 +136,14 @@ return {
     $scope.$on('LastRepeaterElement', function(){
       console.log('good to go');
     });
+
+    $scope.appliedClass = function(name) {
+        if (name === $scope.name) {
+            return "rightdiv";
+        } else {
+            return "leftdiv"; // Or even "", which won't add any additional classes to the element
+        }
+    };
 
     $scope.addMessage = function() {
       // calling $add on a synchronized array is like Array.push(),
@@ -206,6 +213,12 @@ return {
 
 .controller("SignInCtrl", ["$scope", "$firebaseArray", "$state", "User",
   function($scope, $firebaseArray, $state, User){
+    var userIsLoggedIn = User.isAuth();
+    if(userIsLoggedIn){
+      User.setAuthObj(userIsLoggedIn);
+      $state.go('messages');
+    }
+
     $scope.signIn = function(username, password) {
       $scope.signInEmail = '';
       $scope.signInPassword = '';

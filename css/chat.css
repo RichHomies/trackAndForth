@@ -63,9 +63,12 @@ em {
   text-align: left;
   display:block;
 }
-
-
-
+#youTube {
+  padding-bottom: 25px;
+  border-bottom-width: 25px;
+  border-top-width: 25px;
+  padding-top: 25px;
+}
 
 #nameView, #registerView, #messageView, #signInView {
   display: visible;
@@ -80,5 +83,11 @@ em {
 }
 
 #messageInput {
-  width: 68%;
+  width: 95%;
 }
+
+.rightdiv {
+  float: right;
+  width: 250px;
+}
+
