@@ -127,8 +127,8 @@ return {
       $scope.name = User.getName();
       $scope.$apply();  
     });
-    
     $scope.trustSrc = function(src) {
+      return $sce.trustAsResourceUrl("https://www.youtube.com/v/" + src);
       return $sce.trustAsResourceUrl("https://www.youtube.com/embed/" + src);
     };
 
