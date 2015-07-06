@@ -33,6 +33,7 @@ var app = angular.module("chatApp", ["firebase", "luegg.directives", 'ui.router'
   var ref = new Firebase("https://chromechatapp.firebaseio.com/chat");
   var userRef = new Firebase('https://chromechatapp.firebaseio.com/usersInfo');
   var youTubeRef = new Firebase("https://chromechatapp.firebaseio.com/youtube");
+  var soundCloudRef = new Firebase("https://chromechatapp.firebaseio.com/soundcloud");
   
   var authDataObj;
   var name;
@@ -110,7 +111,8 @@ return {
   getAuthObj : getAuthObj,
   ref : ref,
   isAuth : isAuth,
-  youTubeRef: youTubeRef
+  youTubeRef: youTubeRef,
+  soundCloudRef : soundCloudRef
 };
 
 })
@@ -120,6 +122,8 @@ return {
   function($scope, $firebaseArray, User, $state, $sce) {
     $scope.messages = $firebaseArray(User.ref);
     $scope.youtubeLinks =  $firebaseArray(User.youTubeRef);
+    $scope.soundcloudLinks =  $firebaseArray(User.soundCloudRef);
+
     $scope.name;
 
     User.fetchUserObjFromFirebase(function(nameString){
@@ -127,8 +131,18 @@ return {
       $scope.name = User.getName();
       $scope.$apply();  
     });
+
+    $scope.soundcloudid = function(url){
+      return url ;
+    };
+
+    $scope.soundCloud = function(url){
+      var iframeElementID = url;
+      var widget1         = SC.Widget(url);
+      widget1.load(url);
+    };
+
     $scope.trustSrc = function(src) {
-      return $sce.trustAsResourceUrl("https://www.youtube.com/v/" + src);
       return $sce.trustAsResourceUrl("https://www.youtube.com/embed/" + src);
     };
 

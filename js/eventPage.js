@@ -14,7 +14,7 @@ messagesRef.limitToLast(25).on("child_added", function (snapshot) {
 });
 
 
-function onClickHandler(info, tab) {
+var onClickHandler = function(info, tab) {
     console.log("item " + info.menuItemId + " was clicked");
     console.log("info: " + JSON.stringify(info));
     console.log("tab: " + JSON.stringify(tab));
@@ -38,7 +38,9 @@ chrome.runtime.onInstalled.addListener(function() {
 });
 
 var contextMenuHandlerPushSongToFirebase = function(song){
-  var ref = new Firebase("https://chromechatapp.firebaseio.com/youtube");
+  var ytref = new Firebase("https://chromechatapp.firebaseio.com/youtube");
+  var scref = new Firebase("https://chromechatapp.firebaseio.com/soundcloud");  
+  
   var id;
   var ts = new Date();
   ts = ts.toString();
@@ -47,8 +49,19 @@ var contextMenuHandlerPushSongToFirebase = function(song){
   if(youtubeCheck[1].substring(0, 7) === 'youtube'){
     id = song.split('=');
     id = id[1];
+    pushToFbase(ytref, id, ts);
   }
 
+  var soundcloudCheck = song.split('//');
+
+  if(soundcloudCheck[1] === 'soundcloud'){
+    pushToFbase(scref, song, ts);
+  }
+
+};
+
+
+var pushToFbase = function(ref, id, ts){
   if(nameString){
     ref.push({
       name: nameString, 
@@ -59,3 +72,8 @@ var contextMenuHandlerPushSongToFirebase = function(song){
     alert('you are not logged in');
   }
 };
+
+
+
+
+
