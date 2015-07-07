@@ -53,8 +53,9 @@ var contextMenuHandlerPushSongToFirebase = function(song){
   }
 
   var soundcloudCheck = song.split('//');
+  soundcloudCheck = soundcloudCheck[1].split('.');
 
-  if(soundcloudCheck[1] === 'soundcloud'){
+  if(soundcloudCheck[0] === 'soundcloud'){
     pushToFbase(scref, song, ts);
   }
 

@@ -3,6 +3,7 @@
 var app = angular.module("chatApp", ["firebase", "luegg.directives", 'ui.router', 'ngSanitize'])
 
 .config(function($stateProvider, $urlRouterProvider){
+  
   // For any unmatched url, send to /route1
   $urlRouterProvider.otherwise("/signIn");
 
@@ -133,17 +134,22 @@ return {
     });
 
     $scope.soundcloudid = function(url){
-      return url ;
+      return url.text ;
     };
 
     $scope.soundCloud = function(url){
       var iframeElementID = url;
-      var widget1         = SC.Widget(url);
-      widget1.load(url);
+      var widget1         = SC.Widget(iframeElementID);
+      widget1.load(iframeElementID);
+      return '';
     };
 
-    $scope.trustSrc = function(src) {
+    $scope.ytTrustSrc = function(src) {
       return $sce.trustAsResourceUrl("https://www.youtube.com/embed/" + src);
+    };
+
+    $scope.scTrustSrc = function(src) {
+      return $sce.trustAsResourceUrl(src);
     };
 
 
@@ -184,6 +190,7 @@ return {
       User.setName(null);
       User.unauth();
     }
+
   }])
 
 .controller("RegisterCtrl", ["$scope", "$firebaseArray", "$state", "User",
