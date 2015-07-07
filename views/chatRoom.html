@@ -16,8 +16,7 @@
     <i class="material-icons"></i>
   </button>
 
-
-  <div id="youTube" ng-show="{{youtubeLinks}}">
+  <div id="youTube" ng-if="youtubeLinks.length">
     <hr>
     Youtube
     <div ng-repeat="youtube in youtubeLinks"> <div>{{youtube.name}}</div>

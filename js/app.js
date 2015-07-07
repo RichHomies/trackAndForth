@@ -30,7 +30,7 @@ var app = angular.module("chatApp", ["firebase", "luegg.directives", 'ui.router'
 .run(function(){
   chrome.browserAction.setIcon({path:"assets/diamond.png"});
 })
-.factory('User', function ($state) {
+.factory('User', function ($state, $http) {
   var ref = new Firebase("https://chromechatapp.firebaseio.com/chat");
   var userRef = new Firebase('https://chromechatapp.firebaseio.com/usersInfo');
   var youTubeRef = new Firebase("https://chromechatapp.firebaseio.com/youtube");
@@ -100,6 +100,14 @@ var signIn = function(username, password, cb) {
   });
 };
 
+var getSCData = function(url, cb){
+  var string = "http://api.soundcloud.com/resolve.json?url=" + url + "&client_id=aa3e10d2de1e1304e62f07feb898e745";
+
+  $http.get(string)
+    .success(function(response) {
+      cb(response);
+    });
+}
 return {
   saveUserObjToFirebase : saveUserObjToFirebase,
   fetchUserObjFromFirebase : fetchUserObjFromFirebase,
@@ -113,17 +121,25 @@ return {
   ref : ref,
   isAuth : isAuth,
   youTubeRef: youTubeRef,
-  soundCloudRef : soundCloudRef
+  soundCloudRef : soundCloudRef,
+  getSCData : getSCData
 };
 
 })
 
-.controller("ChatCtrl", ["$scope", "$firebaseArray", "User", "$state", "$sce",
+.controller("ChatCtrl", ["$scope", "$firebaseArray", "User", "$state", "$sce", "$http",
   // we pass our new chatMessages factory into the controller
-  function($scope, $firebaseArray, User, $state, $sce) {
+  function($scope, $firebaseArray, User, $state, $sce, $http) {
     $scope.messages = $firebaseArray(User.ref);
     $scope.youtubeLinks =  $firebaseArray(User.youTubeRef);
     $scope.soundcloudLinks =  $firebaseArray(User.soundCloudRef);
+    console.log('yt links - ', $scope.youtubeLinks.length);
+    for (var i = 0; i < $scope.soundcloudLinks.length; i++){
+      User.getSCData($scope.soundcloudLinks[i].text, function(response){
+        console.log(response);
+      });
+    }
+
 
     $scope.name;
 
@@ -138,9 +154,13 @@ return {
     };
 
     $scope.soundCloud = function(url){
-      var iframeElementID = url;
-      var widget1         = SC.Widget(iframeElementID);
-      widget1.load(iframeElementID);
+      // var iframeElementID = url;
+      // var widget1         = SC.Widget(iframeElementID);
+      // widget1.load(iframeElementID);
+      SC.oEmbed(url, { auto_play: true }, function(oEmbed) {
+        console.log('oEmbed response: ' + oEmbed);
+      });
+
       return '';
     };
 
