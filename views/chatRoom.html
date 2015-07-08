@@ -5,29 +5,32 @@
       <div>
         <span ng-if="message.name !== name"><strong>{{message.name}} : </strong></span>
         <span ng-if="message.name === name"><strong> Me : </strong></span>
-       {{message.text}}</div>
+        {{message.text}}</div>
+      </div>
+    </div>
+    <form ng-submit="addMessage()">
+      <input type="text" id="messageInput" placeholder="Message..." ng-submit="addMessage()" ng-model="messageText"/>
+    </form>
+    <br>
+    <button class="btn waves-effect waves-light" type="submit" ng-click="logOff()">log off
+      <i class="material-icons"></i>
+    </button>
+
+    <div id="youTube" ng-if="youtubeLinks.length">
+      <hr>
+      Youtube
+      <div ng-repeat="youtube in youtubeLinks"> <div>{{youtube.name}}</div>
+      <iframe width="90%" height="315" ng-src="{{ytTrustSrc(youtube.text)}}"  frameborder="0" allowfullscreen ></iframe> 
     </div>
   </div>
-  <form ng-submit="addMessage()">
-    <input type="text" id="messageInput" placeholder="Message..." ng-submit="addMessage()" ng-model="messageText"/>
-  </form>
-  <br>
-  <button class="btn waves-effect waves-light" type="submit" ng-click="logOff()">log off
-    <i class="material-icons"></i>
-  </button>
 
-  <div id="youTube" ng-if="youtubeLinks.length">
+  <div ng-if="soundcloudLinks.length">
     <hr>
-    Youtube
-    <div ng-repeat="youtube in youtubeLinks"> <div>{{youtube.name}}</div>
-    <iframe width="90%" height="315" ng-src="{{ytTrustSrc(youtube.text)}}"  frameborder="0" allowfullscreen ></iframe> 
+    Soundcloud
+    <div ng-repeat="soundcloudlink in soundcloudLinks">
+      <iframe width="90%" height="166" scrolling="no" frameborder="no" ng-src="{{scTrustSrc(soundcloudlink.text)}}"></iframe>
+    </div>
   </div>
-</div>
-
-<!-- <hr>
-
-Soundcloud
-<iframe ng-repeat="soundcloudLink in soundcloudLinks" id='{{soundcloudLink.text}}' ></iframe> -->
 
 </div>
 

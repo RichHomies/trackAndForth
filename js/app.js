@@ -134,12 +134,6 @@ return {
     $scope.youtubeLinks =  $firebaseArray(User.youTubeRef);
     $scope.soundcloudLinks =  $firebaseArray(User.soundCloudRef);
     console.log('yt links - ', $scope.youtubeLinks.length);
-    for (var i = 0; i < $scope.soundcloudLinks.length; i++){
-      User.getSCData($scope.soundcloudLinks[i].text, function(response){
-        console.log(response);
-      });
-    }
-
 
     $scope.name;
 
@@ -149,26 +143,13 @@ return {
       $scope.$apply();  
     });
 
-    $scope.soundcloudid = function(url){
-      return url.text ;
-    };
-
-    $scope.soundCloud = function(url){
-      // var iframeElementID = url;
-      // var widget1         = SC.Widget(iframeElementID);
-      // widget1.load(iframeElementID);
-      SC.oEmbed(url, { auto_play: true }, function(oEmbed) {
-        console.log('oEmbed response: ' + oEmbed);
-      });
-
-      return '';
-    };
-
+    
     $scope.ytTrustSrc = function(src) {
       return $sce.trustAsResourceUrl("https://www.youtube.com/embed/" + src);
     };
 
     $scope.scTrustSrc = function(src) {
+      src = "https://w.soundcloud.com/player/?url=" + src + "&color=0066cc";
       return $sce.trustAsResourceUrl(src);
     };
 
