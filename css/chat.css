@@ -63,7 +63,7 @@ em {
   text-align: left;
   display:block;
 }
-#youTube {
+#youTube, #soundcloud {
   padding-bottom: 25px;
   border-bottom-width: 25px;
   border-top-width: 25px;

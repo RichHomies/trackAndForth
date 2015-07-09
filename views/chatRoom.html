@@ -27,7 +27,7 @@
   <div ng-if="soundcloudLinks.length">
     <hr>
     Soundcloud
-    <div ng-repeat="soundcloudlink in soundcloudLinks">
+    <div ng-repeat="soundcloudlink in soundcloudLinks" id="soundcloud">
       <iframe width="90%" height="166" scrolling="no" frameborder="no" ng-src="{{scTrustSrc(soundcloudlink.text)}}"></iframe>
     </div>
   </div>
