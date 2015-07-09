@@ -21,14 +21,16 @@
       Youtube
       <div ng-repeat="youtube in youtubeLinks"> <div>{{youtube.name}}</div>
       <iframe width="90%" height="315" ng-src="{{ytTrustSrc(youtube.text)}}"  frameborder="0" allowfullscreen ></iframe> 
+      <img src="../trash.png" class="youTrash" ng-click="remove(youtube, true, false)">
     </div>
   </div>
 
   <div ng-if="soundcloudLinks.length">
     <hr>
     Soundcloud
-    <div ng-repeat="soundcloudlink in soundcloudLinks" id="soundcloud">
-      <iframe width="90%" height="166" scrolling="no" frameborder="no" ng-src="{{scTrustSrc(soundcloudlink.text)}}"></iframe>
+    <div ng-repeat="soundcloudlink in soundcloudLinks" id="soundclod">
+      <iframe width="80%" height="166" scrolling="no" frameborder="no" ng-src="{{scTrustSrc(soundcloudlink.text)}}"></iframe>
+      <img src="../trash.png" class="soundTrash" ng-click="remove(soundcloudlink, false, true)">
     </div>
   </div>
 

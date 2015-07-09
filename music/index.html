@@ -15,22 +15,26 @@
 </head>
 <body class="flow-text">
   <body ng-controller="listCtrl">
-  <div class="container">
-    <div id="youTube" ng-if="youtubeLinks.length">
-      <div align="middle">Youtube</div>
+    <div class="container">
+
+      <div id="youTube" ng-if="youtubeLinks.length">
+        <hr>
+        Youtube
+        <div ng-repeat="youtube in youtubeLinks"> <div>{{youtube.name}}</div>
+        <iframe width="90%" height="315" ng-src="{{ytTrustSrc(youtube.text)}}"  frameborder="0" allowfullscreen ></iframe> 
+        <img src="../trash.png" class="youTrash" ng-click="remove(youtube, true, false)">
+      </div>
+    </div>
+
+    <div ng-if="soundcloudLinks.length">
       <hr>
-      <div ng-repeat="youtube in youtubeLinks" align="middle"> <div>{{youtube.name}}</div>
-      <iframe  align="middle" width="90%" height="315" ng-src="{{ytTrustSrc(youtube.text)}}"  frameborder="0" allowfullscreen ></iframe> 
+      Soundcloud
+      <div ng-repeat="soundcloudlink in soundcloudLinks" id="soundclod">
+        <iframe width="80%" height="166" scrolling="no" frameborder="no" ng-src="{{scTrustSrc(soundcloudlink.text)}}"></iframe>
+        <img src="../trash.png" class="soundTrash" ng-click="remove(soundcloudlink, false, true)">
+      </div>
     </div>
   </div>
-  <div ng-if="soundcloudLinks.length">
-    <div align="middle">Soundcloud</div>
-    <hr>
-    <div ng-repeat="soundcloudlink in soundcloudLinks" align="middle">
-      <iframe align="middle" width="90%" height="166" scrolling="no" frameborder="no" ng-src="{{scTrustSrc(soundcloudlink.text)}}"></iframe>
-    </div>
-  </div>
-</div>
 </body>
 </body>
 </html>

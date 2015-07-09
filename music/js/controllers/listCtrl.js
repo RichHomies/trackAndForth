@@ -11,14 +11,36 @@ app.controller("listCtrl", ['$scope', '$firebaseArray', "$sce", function($scope,
     return ts;
   }
 
-      $scope.ytTrustSrc = function(src) {
-      return $sce.trustAsResourceUrl("https://www.youtube.com/embed/" + src);
+  $scope.ytTrustSrc = function(src) {
+    return $sce.trustAsResourceUrl("https://www.youtube.com/embed/" + src);
+  };
+
+  $scope.scTrustSrc = function(src) {
+    src = "https://w.soundcloud.com/player/?url=" + src + "&color=0066cc";
+    return $sce.trustAsResourceUrl(src);
+  };
+
+  $scope.remove = function(url, yt, sc){
+      var list;
+      if(yt){
+        list = $scope.youtubeLinks;
+      } 
+
+      if(sc){
+        list = $scope.soundcloudLinks;
+      }
+
+      list.$remove(url).then(function(ref) {
+        console.log('removed');
+      });
+
+    };
+    $scope.formatTime = function(dateString){
+      var ts = moment(dateString).fromNow();
+      return ts;
     };
 
-    $scope.scTrustSrc = function(src) {
-      src = "https://w.soundcloud.com/player/?url=" + src + "&color=0066cc";
-      return $sce.trustAsResourceUrl(src);
-    };
-}]);
+
+  }]);
 
 

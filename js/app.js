@@ -3,7 +3,7 @@
 var app = angular.module("chatApp", ["firebase", "luegg.directives", 'ui.router', 'ngSanitize'])
 
 .config(function($stateProvider, $urlRouterProvider){
-  
+
   // For any unmatched url, send to /route1
   $urlRouterProvider.otherwise("/signIn");
 
@@ -104,9 +104,9 @@ var getSCData = function(url, cb){
   var string = "http://api.soundcloud.com/resolve.json?url=" + url + "&client_id=aa3e10d2de1e1304e62f07feb898e745";
 
   $http.get(string)
-    .success(function(response) {
-      cb(response);
-    });
+  .success(function(response) {
+    cb(response);
+  });
 }
 return {
   saveUserObjToFirebase : saveUserObjToFirebase,
@@ -159,14 +159,14 @@ return {
     });
 
     $scope.appliedClass = function(name) {
-        if (name === $scope.name) {
-            return "rightdiv";
-        } else {
+      if (name === $scope.name) {
+        return "rightdiv";
+      } else {
             return "leftdiv"; // Or even "", which won't add any additional classes to the element
-        }
-    };
+          }
+        };
 
-    $scope.addMessage = function() {
+        $scope.addMessage = function() {
       // calling $add on a synchronized array is like Array.push(),
       // except that it saves the changes to our Firebase database!
       var ts = new Date();
@@ -179,6 +179,29 @@ return {
       });
       // reset the message input
       $scope.messageText = "";
+    };
+
+    $scope.remove = function(url, yt, sc){
+      //iterate through array
+      //get the index of the element in the list
+      //remove that shit
+      var list;
+      if(yt){
+        list = $scope.youtubeLinks;
+        console.log('yt');
+      } 
+
+      if(sc){
+        list = $scope.soundcloudLinks;
+        console.log('sc');
+        console.log(list);
+        console.log(url);
+      }
+
+      list.$remove(url).then(function(ref) {
+        console.log('removed');
+      });
+
     };
     $scope.formatTime = function(dateString){
       var ts = moment(dateString).fromNow();
