@@ -1,4 +1,4 @@
-app.controller("listCtrl", ['$scope', '$firebaseArray', "$sce", function($scope, $firebaseArray, $sce) {
+app.controller("listCtrl", ['$scope', '$firebaseArray', "$sce", 'playlist', function($scope, $firebaseArray, $sce, playlist) {
   var youTubeRef = new Firebase("https://chromechatapp.firebaseio.com/youtube");
   var soundCloudRef = new Firebase("https://chromechatapp.firebaseio.com/soundcloud");
   // download the data into a local object
@@ -21,24 +21,29 @@ app.controller("listCtrl", ['$scope', '$firebaseArray', "$sce", function($scope,
   };
 
   $scope.remove = function(url, yt, sc){
-      var list;
-      if(yt){
-        list = $scope.youtubeLinks;
-      } 
+    var list;
+    if(yt){
+      list = $scope.youtubeLinks;
+    } 
 
-      if(sc){
-        list = $scope.soundcloudLinks;
-      }
+    if(sc){
+      list = $scope.soundcloudLinks;
+    }
 
-      list.$remove(url).then(function(ref) {
-        console.log('removed');
-      });
+    list.$remove(url).then(function(ref) {
+      console.log('removed');
+    });
+  };
 
-    };
-    $scope.formatTime = function(dateString){
-      var ts = moment(dateString).fromNow();
-      return ts;
-    };
+  $scope.formatTime = function(dateString){
+    var ts = moment(dateString).fromNow();
+    return ts;
+  };
+
+  $scope.dequeue = function(url){
+    console.log('ended - dequeue ', url);
+  };
+
 
 
   }]);

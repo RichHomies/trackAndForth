@@ -126,6 +126,41 @@ return {
 };
 
 })
+// .directive('player', [function() {
+//   return {
+//     restrict: 'AE',
+//     templateUrl : ,
+//     link: function($scope, $element, $attrs) {
+//       $scope.ended = function(){
+//         console.log('ended');
+//       };
+//     }; 
+//   }])
+
+// directive('myIframe', function(){
+//     var linkFn = function(scope, element, attrs) {
+//         element.find('iframe').bind('load', function (event) {
+//           ended();
+//         });
+//     };
+
+//     var ended = function(){
+//       console.log('ended');
+//     };
+
+
+//     return {
+//       restrict: 'EA',
+//       scope: {
+//         src:'@src',
+//         height: '@height',
+//         width: '@width',
+//         scrolling: '@scrolling'
+//       },
+//       template: '<iframe class="frame" height="{{height}}" width="{{width}}" frameborder="0" border="0" marginwidth="0" marginheight="0" scrolling="{{scrolling}}" src="{{src}}"></iframe>',
+//       link : linkFn
+//     };
+//   });
 
 .controller("ChatCtrl", ["$scope", "$firebaseArray", "User", "$state", "$sce", "$http",
   // we pass our new chatMessages factory into the controller
@@ -143,7 +178,18 @@ return {
       $scope.$apply();  
     });
 
-    
+
+
+    window.ended = function(){
+      console.log('ended');
+    };
+
+    var els = document.getElementsByTagName('iframe');
+
+    for(var i = 0; i < els.length; i++){
+      $scope.$on("onended", ended);
+    }
+
     $scope.ytTrustSrc = function(src) {
       return $sce.trustAsResourceUrl("https://www.youtube.com/embed/" + src);
     };
