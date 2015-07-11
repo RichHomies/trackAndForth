@@ -31,11 +31,13 @@ var app = angular.module("chatApp", ["firebase", "luegg.directives", 'ui.router'
   chrome.browserAction.setIcon({path:"assets/diamond.png"});
 })
 .factory('User', function ($state, $http) {
-  var ref = new Firebase("https://chromechatapp.firebaseio.com/chat");
-  var userRef = new Firebase('https://chromechatapp.firebaseio.com/usersInfo');
-  var youTubeRef = new Firebase("https://chromechatapp.firebaseio.com/youtube");
-  var soundCloudRef = new Firebase("https://chromechatapp.firebaseio.com/soundcloud");
+    var str = 'https://publicappchat.firebaseio.com/'
+    var ref = new Firebase(str + "/chat");
+    var userRef = new Firebase(str + '/usersInfo');
+    var youTubeRef = new Firebase(str + "/youtube");
+    var soundCloudRef = new Firebase(str + "/soundcloud");
   
+
   var authDataObj;
   var name;
 
@@ -126,6 +128,41 @@ return {
 };
 
 })
+// .directive('player', [function() {
+//   return {
+//     restrict: 'AE',
+//     templateUrl : ,
+//     link: function($scope, $element, $attrs) {
+//       $scope.ended = function(){
+//         console.log('ended');
+//       };
+//     }; 
+//   }])
+
+// directive('myIframe', function(){
+//     var linkFn = function(scope, element, attrs) {
+//         element.find('iframe').bind('load', function (event) {
+//           ended();
+//         });
+//     };
+
+//     var ended = function(){
+//       console.log('ended');
+//     };
+
+
+//     return {
+//       restrict: 'EA',
+//       scope: {
+//         src:'@src',
+//         height: '@height',
+//         width: '@width',
+//         scrolling: '@scrolling'
+//       },
+//       template: '<iframe class="frame" height="{{height}}" width="{{width}}" frameborder="0" border="0" marginwidth="0" marginheight="0" scrolling="{{scrolling}}" src="{{src}}"></iframe>',
+//       link : linkFn
+//     };
+//   });
 
 .controller("ChatCtrl", ["$scope", "$firebaseArray", "User", "$state", "$sce", "$http",
   // we pass our new chatMessages factory into the controller
@@ -143,7 +180,18 @@ return {
       $scope.$apply();  
     });
 
-    
+
+
+    window.ended = function(){
+      console.log('ended');
+    };
+
+    var els = document.getElementsByTagName('iframe');
+
+    for(var i = 0; i < els.length; i++){
+      $scope.$on("onended", ended);
+    }
+
     $scope.ytTrustSrc = function(src) {
       return $sce.trustAsResourceUrl("https://www.youtube.com/embed/" + src);
     };

@@ -99,9 +99,14 @@ img.soundTrash {
   padding-bottom: 150px;
 }
 
+#logout{
+  padding-bottom: 25px;
+}
+
 iframe {
   padding-left: 16px;
 }
+
 @font-face {
   font-family: 'Material Icons';
   font-style: normal;

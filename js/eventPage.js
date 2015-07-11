@@ -1,5 +1,6 @@
-var messagesRef = new Firebase("https://chromechatapp.firebaseio.com/chat");
+var messagesRef = new Firebase("https://publicappchat.firebaseio.com/");
 // Add a callback that is triggered for each chat message.
+
 var nameString;
 
 messagesRef.limitToLast(25).on("child_added", function (snapshot) {
@@ -38,9 +39,10 @@ chrome.runtime.onInstalled.addListener(function() {
 });
 
 var contextMenuHandlerPushSongToFirebase = function(song){
-  var ytref = new Firebase("https://chromechatapp.firebaseio.com/youtube");
-  var scref = new Firebase("https://chromechatapp.firebaseio.com/soundcloud");  
-  
+    var str = 'https://publicappchat.firebaseio.com/';
+    var ytref = new Firebase(str + "/youtube");
+    var scref = new Firebase(str + "/soundcloud");
+
   var id;
   var ts = new Date();
   ts = ts.toString();
