@@ -4,10 +4,13 @@ var app = express();
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(express.static(__dirname + '/'));
+
 app.get('/', function(request, response){
-  response.send('./index.html');
+
 });
+
+app.post('/', )
+
 
 var server = app.listen(3000, function () {
   var port = server.address().port;

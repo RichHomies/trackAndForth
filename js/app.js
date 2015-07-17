@@ -5,13 +5,17 @@ var app = angular.module("chatApp", ["firebase", "luegg.directives", 'ui.router'
 .config(function($stateProvider, $urlRouterProvider){
 
   // For any unmatched url, send to /route1
-  $urlRouterProvider.otherwise("/signIn");
+  $urlRouterProvider.otherwise("/firebase");
 
   $stateProvider
   .state('home', {
     url: "/",
     templateUrl: "views/register.html"
-
+  })
+  .state('firebase', {
+    url: "/firebase",
+    templateUrl: "views/getFirebaseRef.html",
+    controller: "firebaseCtrl"
   })
   .state('signIn', {
     url: "/signIn",
@@ -20,6 +24,11 @@ var app = angular.module("chatApp", ["firebase", "luegg.directives", 'ui.router'
   .state('name', {
     url: "/name",
     templateUrl: "views/name.html"
+  })
+  .state('help', {
+    url: "/help",
+    templateUrl: "views/help.html",
+    controller: "helpCtrl"
   })
   .state('messages', {
     url: "/messages",
@@ -31,7 +40,7 @@ var app = angular.module("chatApp", ["firebase", "luegg.directives", 'ui.router'
   chrome.browserAction.setIcon({path:"assets/diamond.png"});
 })
 .factory('User', function ($state, $http) {
-    var str = 'https://publicappchat.firebaseio.com/'
+    var str = 'https://wyattchatapp.firebaseio.com/';
     var ref = new Firebase(str + "/chat");
     var userRef = new Firebase(str + '/usersInfo');
     var youTubeRef = new Firebase(str + "/youtube");
@@ -110,6 +119,19 @@ var getSCData = function(url, cb){
     cb(response);
   });
 }
+
+var setStr = function(data){
+  str = data;
+  ref = new Firebase(str + "/chat");
+  userRef = new Firebase(str + '/usersInfo');
+  youTubeRef = new Firebase(str + "/youtube");
+  soundCloudRef = new Firebase(str + "/soundcloud");
+}
+
+var getStr = function(){
+  return str;
+}
+
 return {
   saveUserObjToFirebase : saveUserObjToFirebase,
   fetchUserObjFromFirebase : fetchUserObjFromFirebase,
@@ -124,45 +146,12 @@ return {
   isAuth : isAuth,
   youTubeRef: youTubeRef,
   soundCloudRef : soundCloudRef,
-  getSCData : getSCData
+  getSCData : getSCData,
+  setStr : setStr,
+  getStr : getStr
 };
 
 })
-// .directive('player', [function() {
-//   return {
-//     restrict: 'AE',
-//     templateUrl : ,
-//     link: function($scope, $element, $attrs) {
-//       $scope.ended = function(){
-//         console.log('ended');
-//       };
-//     }; 
-//   }])
-
-// directive('myIframe', function(){
-//     var linkFn = function(scope, element, attrs) {
-//         element.find('iframe').bind('load', function (event) {
-//           ended();
-//         });
-//     };
-
-//     var ended = function(){
-//       console.log('ended');
-//     };
-
-
-//     return {
-//       restrict: 'EA',
-//       scope: {
-//         src:'@src',
-//         height: '@height',
-//         width: '@width',
-//         scrolling: '@scrolling'
-//       },
-//       template: '<iframe class="frame" height="{{height}}" width="{{width}}" frameborder="0" border="0" marginwidth="0" marginheight="0" scrolling="{{scrolling}}" src="{{src}}"></iframe>',
-//       link : linkFn
-//     };
-//   });
 
 .controller("ChatCtrl", ["$scope", "$firebaseArray", "User", "$state", "$sce", "$http",
   // we pass our new chatMessages factory into the controller
@@ -343,6 +332,33 @@ return {
       soonToBeNamed = '';
       $state.go('messages');
     };        
+
+  }])
+.controller("firebaseCtrl", ["$scope", "$firebaseArray", "$state", "User",
+  function($scope, $firebaseArray, $state, User){
+    
+    if(User.getStr()){
+      console.log(User.getStr());
+      $state.go('signIn');
+    }
+
+    $scope.update = function(){
+      var temp = $scope.stringRef;
+      temp = temp.split('.');
+      if(temp[temp.length - 2] === 'firebaseio'){
+        User.setStr($scope.stringRef);
+        $state.go('signIn');
+      } 
+      $scope.stringRef = '';
+    };        
+
+  }])
+.controller("helpCtrl", ["$scope", "$firebaseArray", "$state", "User",
+  function($scope, $firebaseArray, $state, User){
+    
+    $scope.goBack =  function(){
+      $state.go('firebase');
+    }
 
   }])
 
