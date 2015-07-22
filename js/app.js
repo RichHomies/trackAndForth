@@ -40,13 +40,11 @@ var app = angular.module("chatApp", ["firebase", "luegg.directives", 'ui.router'
   chrome.browserAction.setIcon({path:"assets/diamond.png"});
 })
 .factory('User', function ($state, $http) {
-    var str = 'https://wyattchatapp.firebaseio.com/';
-    var ref = new Firebase(str + "/chat");
-    var userRef = new Firebase(str + '/usersInfo');
-    var youTubeRef = new Firebase(str + "/youtube");
-    var soundCloudRef = new Firebase(str + "/soundcloud");
-  
-
+  var str = '';
+  var ref;
+  var userRef;
+  var youTubeRef;
+  var soundCloudRef;
   var authDataObj;
   var name;
 
@@ -120,16 +118,33 @@ var getSCData = function(url, cb){
   });
 }
 
-var setStr = function(data){
-  str = data;
+var initRef = function(){
   ref = new Firebase(str + "/chat");
   userRef = new Firebase(str + '/usersInfo');
   youTubeRef = new Firebase(str + "/youtube");
   soundCloudRef = new Firebase(str + "/soundcloud");
 }
 
-var getStr = function(){
-  return str;
+var setStr = function(data){
+  str = data;
+  initRef();
+}
+
+var getRef = function(){
+  return {
+    ref : ref,
+    userRef : userRef,
+    youTubeRef : youTubeRef,
+    soundCloudRef : soundCloudRef
+  };
+}
+
+var fetchFromLocalStorage =  function(cb){
+  var obj = {};
+  obj['firebaseRef'] = true;
+  chrome.storage.sync.get(obj, function(localStorageObject){
+    cb(localStorageObject);
+  });
 }
 
 return {
@@ -148,7 +163,8 @@ return {
   soundCloudRef : soundCloudRef,
   getSCData : getSCData,
   setStr : setStr,
-  getStr : getStr
+  getRef : getRef,
+  fetchFromLocalStorage : fetchFromLocalStorage
 };
 
 })
@@ -156,9 +172,11 @@ return {
 .controller("ChatCtrl", ["$scope", "$firebaseArray", "User", "$state", "$sce", "$http",
   // we pass our new chatMessages factory into the controller
   function($scope, $firebaseArray, User, $state, $sce, $http) {
-    $scope.messages = $firebaseArray(User.ref);
-    $scope.youtubeLinks =  $firebaseArray(User.youTubeRef);
-    $scope.soundcloudLinks =  $firebaseArray(User.soundCloudRef);
+    var obj = User.getRef();
+    console.log(obj);
+    $scope.messages = $firebaseArray(obj.ref);
+    $scope.youtubeLinks =  $firebaseArray(obj.youTubeRef);
+    $scope.soundcloudLinks =  $firebaseArray(obj.soundCloudRef);
     console.log('yt links - ', $scope.youtubeLinks.length);
 
     $scope.name;
@@ -203,13 +221,13 @@ return {
           }
         };
 
-        $scope.addMessage = function() {
+    $scope.addMessage = function() {
       // calling $add on a synchronized array is like Array.push(),
       // except that it saves the changes to our Firebase database!
       var ts = new Date();
       ts = ts.toString();
-      
-      User.ref.push({
+      console.log(obj);
+      obj.ref.push({
         name: $scope.name, 
         text: $scope.messageText, 
         timeStamp: ts
@@ -262,6 +280,7 @@ return {
       $state.go('messages');
     }
 
+
     $scope.registerUser = function(username, password) {
       $scope.registerEmail = '';
       $scope.registerPassword = '';
@@ -295,11 +314,14 @@ return {
 
 .controller("SignInCtrl", ["$scope", "$firebaseArray", "$state", "User",
   function($scope, $firebaseArray, $state, User){
+
     var userIsLoggedIn = User.isAuth();
     if(userIsLoggedIn){
       User.setAuthObj(userIsLoggedIn);
       $state.go('messages');
     }
+
+
 
     $scope.signIn = function(username, password) {
       $scope.signInEmail = '';
@@ -336,26 +358,55 @@ return {
   }])
 .controller("firebaseCtrl", ["$scope", "$firebaseArray", "$state", "User",
   function($scope, $firebaseArray, $state, User){
-    
-    if(User.getStr()){
-      console.log(User.getStr());
-      $state.go('signIn');
-    }
+    User.fetchFromLocalStorage(function(localStorageObject){
+      var refExists = localStorageObject.firebaseRef;
+      console.log(refExists);
+      
+      if(refExists){
+        var firebaseIdentifier = refExists.split('.');
+        firebaseIdentifier = firebaseIdentifier[1];
+        if(firebaseIdentifier === 'firebaseio'){
+          User.setStr(refExists);
+          $state.go('signIn');
+        }
+      } else {
+        console.log('fb ref does not exist');
 
-    $scope.update = function(){
-      var temp = $scope.stringRef;
-      temp = temp.split('.');
-      if(temp[temp.length - 2] === 'firebaseio'){
-        User.setStr($scope.stringRef);
-        $state.go('signIn');
-      } 
-      $scope.stringRef = '';
-    };        
+      }
+    
+      $scope.update = function(){
+        var temp = $scope.stringRef;
+        temp = temp.split('.');
+        if(temp[temp.length - 2] === 'firebaseio'){
+          User.setStr($scope.stringRef);
+          $state.go('signIn');
+        } 
+        $scope.stringRef = '';
+      }; 
+
+      $scope.help = function(){
+        $state.go('help');
+      }       
+
+      $scope.saveToLocalStorage =  function(){
+        var obj = {};
+        obj['firebaseRef'] = $scope.stringRef;
+        $scope.stringRef = '';
+        chrome.storage.sync.set(obj, function(){
+          console.log('saved firebase reference');
+          $state.go('signIn');
+        });
+      }
+
+
+    });
+
+    
+
 
   }])
 .controller("helpCtrl", ["$scope", "$firebaseArray", "$state", "User",
   function($scope, $firebaseArray, $state, User){
-    
     $scope.goBack =  function(){
       $state.go('firebase');
     }
