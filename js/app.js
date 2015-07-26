@@ -162,6 +162,7 @@ return {
   // we pass our new chatMessages factory into the controller
   function($scope, $firebaseArray, User, $state, $sce, $http) {
     var obj = User.getRef();
+ 
     var mapArray = function(arr) {
       console.log('mapArray console log arr ', arr);
       console.log('mapArray console log arr[0] ', arr[0]);
@@ -260,6 +261,12 @@ return {
       var ts = moment(dateString).fromNow();
       return ts;
     };
+
+    $scope.show = function(isShowing){
+      return !isShowing;
+    };
+
+
 
     $scope.logOff = function(){
       $state.go('signIn');

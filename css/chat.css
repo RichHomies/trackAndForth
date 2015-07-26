@@ -33,6 +33,9 @@ input {
   font-size: 24px;
 }
 
+.mediaButton {
+  background-color: white;
+}
 .input {
   color: #424547;
   border: 1px solid #c2c2c2;
@@ -119,18 +122,27 @@ input {
     font-size: 12px;
   }
 
- .card-panel {
+  .card-panel {
     margin-bottom: 0px;
     margin-top: 0px;
     padding-top: 0px;
     padding-bottom: 0px;
- }
+  }
   #main {
     background-color: white;
   }
 
-  
+  .mediaButton {
+    height: 100%;
+    margin-bottom: 12px;
+  }
 
+  #ytCard {
+    margin-bottom: 10px;
+    margin-top: 10px;
+    margin-right: 6px;
+    margin-left: 6px;
+  }
   iframe {
     padding-left: 16px;
   }
