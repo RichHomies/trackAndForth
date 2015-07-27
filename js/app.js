@@ -162,7 +162,7 @@ return {
   // we pass our new chatMessages factory into the controller
   function($scope, $firebaseArray, User, $state, $sce, $http) {
     var obj = User.getRef();
- 
+
     var mapArray = function(arr) {
       console.log('mapArray console log arr ', arr);
       console.log('mapArray console log arr[0] ', arr[0]);
@@ -185,24 +185,23 @@ return {
       return output;
     }
 
+    $scope.name;
     $scope.messages = $firebaseArray(obj.ref);
     $scope.youtubeLinks = $firebaseArray(obj.youTubeRef);
     $scope.soundcloudLinks = $firebaseArray(obj.soundCloudRef);
 
-     $scope.messages.$loaded()
-        .then(function(data) {
-          console.log('loaded ',$scope.messages === data); // true
-          $scope.messages = data;
-        })
-        .catch(function(error) {
-          console.log("Error:", error);
-        });
+   $scope.messages.$loaded()
+    .then(function(data) {
+      console.log('loaded ',$scope.messages === data); // true
+      $scope.messages = data;
+    })
+    .catch(function(error) {
+      console.log("Error:", error);
+    });
 
-
-    
-
-
-    $scope.name;
+    $scope.$on('LastRepeaterElement', function(){
+      console.log('good to go');
+    });
 
     User.fetchUserObjFromFirebase(function(nameString){
       User.setName(nameString);
@@ -210,9 +209,6 @@ return {
       $scope.$apply();  
     });
 
-    $scope.$on('LastRepeaterElement', function(){
-      console.log('good to go');
-    });
 
     $scope.ytTrustSrc = function(src) {
       return $sce.trustAsResourceUrl("https://www.youtube.com/embed/" + src);
@@ -266,8 +262,6 @@ return {
       return !isShowing;
     };
 
-
-
     $scope.logOff = function(){
       $state.go('signIn');
       User.setAuthObj(null);
@@ -279,7 +273,6 @@ return {
       $state.go('firebase');
     }
 
-
   }])
 
 .controller("RegisterCtrl", ["$scope", "$firebaseArray", "$state", "User",
@@ -290,7 +283,6 @@ return {
       User.setAuthObj(userIsLoggedIn);
       $state.go('messages');
     }
-
 
     $scope.registerUser = function(username, password) {
       $scope.registerEmail = '';
@@ -414,22 +406,14 @@ return {
         }
 
       }
-
-
     });
-
-
-
-
 }])
 .controller("helpCtrl", ["$scope", "$firebaseArray", "$state", "User",
   function($scope, $firebaseArray, $state, User){
     $scope.goBack =  function(){
       $state.go('firebase');
     }
-
   }])
-
 .directive('emitLastRepeaterElement', function() {
   return function(scope) {
     if (scope.$last){

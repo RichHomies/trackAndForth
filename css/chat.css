@@ -99,7 +99,7 @@ input {
 
 
   #messageInput {
-    width: 75%;
+    width: 76%;
   }
 
   .messageDiv {
@@ -122,12 +122,18 @@ input {
     font-size: 12px;
   }
 
+  #messageSubmitBtn {
+    right: 12px;
+    float: right;
+  }
+
   .card-panel {
     margin-bottom: 0px;
     margin-top: 0px;
     padding-top: 0px;
     padding-bottom: 0px;
   }
+  
   #main {
     background-color: white;
   }
