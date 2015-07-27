@@ -1,12 +1,12 @@
-<div id="signInView" ng-controller="SignInCtrl" class="container">
+<div id='signInView' ng-controller='SignInCtrl' class='container'>
   <div>sign in, please</div>
-  <div ng-show="error">{{error}}</div>
-  <form id="signInUser" autocomplete="on" ng-submit="signIn(signInEmail, signInPassword)">
-    <input type="email" ng-model="signInEmail" class="input" placeholder="email" autofocus autocomplete="on"/>
-    <input type="password" ng-model="signInPassword" class="input" placeholder="password"/>
-    <button class="btn waves-effect waves-light" type="submit" name="action">Submit
-      <i class="material-icons">send</i>
+  <div ng-show='error'>{{error}}</div>
+  <form id='signInUser' autocomplete='on' ng-submit='signIn(signInEmail, signInPassword)'>
+    <input type='email' ng-model='signInEmail' class='input' placeholder='email' autofocus autocomplete='on'/>
+    <input type='password' ng-model='signInPassword' class='input' placeholder='password'/>
+    <button class='btn waves-effect waves-light' type='submit' name='action'>Submit
+      <i class='material-icons'>send</i>
     </button>
   </form>
-  <a class="waves-effect waves-teal btn-flat" ng-click="goToRegister()">sign up</a>
+  <a class='waves-effect waves-teal btn-flat' ng-click='goToRegister()'>sign up</a>
 </div>

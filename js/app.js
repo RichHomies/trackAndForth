@@ -273,6 +273,25 @@ return {
       $state.go('firebase');
     }
 
+     $scope.submitFeedback = function(){
+      var submitRef = new Firebase('https://feedbackapp.firebaseio.com/');
+      var ts = new Date();
+      console.log($scope.name);
+      console.log($scope.feedbackText);
+
+      submitRef.push({
+        name: $scope.name, 
+        text: $scope.feedbackText, 
+        timeStamp: ts,
+        app: 'chat'
+      });
+
+      $scope.response = 'Thanks!';
+      $scope.$apply();
+      $scope.showHelp = false;
+
+     }
+
   }])
 
 .controller("RegisterCtrl", ["$scope", "$firebaseArray", "$state", "User",

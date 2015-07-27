@@ -1,63 +1,67 @@
-<div id='main' ng-controller="ChatCtrl">
-  <div id="logout">
-    <button class="btn waves-effect waves-light" type="submit" ng-click="logOff()">log off
-      <i class="material-icons"></i>
-    </button>
-  </div>
+<div id='main' ng-controller='ChatCtrl'>
+<div id='logout'>
+  <button class='btn waves-effect waves-light' type='submit' ng-click='logOff()'>log off
+    <i class='material-icons'></i>
+  </button>
+</div>
 
-  <div align='middle'><i class="medium material-icons">forum</i></div>
-  <div id="messagesDiv" scroll-glue="!glued">
-    <div ng-repeat="message in messages | orderBy: reverse" emit-last-repeater-element>
-      <div class='card-panel word' ng-click='show = !show'>
-        <strong>{{message.name}}</strong> | {{message.text}} 
-        <div ng-model='show' ng-init='show = false'>
-          <div ng-if='show'>{{formatTime(message.timeStamp)}}</div>
-        </div>  
+<div align='middle'><i class='medium material-icons'>forum</i></div>
+<div id='messagesDiv' scroll-glue='!glued'>
+  <div ng-repeat='message in messages | orderBy: reverse' emit-last-repeater-element>
+    <div class='card-panel word' ng-click='show = !show'>
+      <strong>{{message.name}}</strong> | {{message.text}} 
+      <div ng-model='show' ng-init='show = false'>
+        <div ng-if='show'>{{formatTime(message.timeStamp)}}</div>
+      </div>  
+    </div>
+  </div>
+</div>
+
+<form ng-submit='addMessage()' align='middle'>
+  <input type='text' id='messageInput' placeholder='Chat here' ng-submit='addMessage()' ng-model='messageText'/>
+  <button class='btn waves-effect waves-light' id='messageSubmitBtn' type='submit' name='action'>
+    <i class='material-icons'>send</i>
+  </button>
+</form>
+
+<div id='youTube' ng-if='youtubeLinks.length'>
+  <a class='waves-effect waves-light btn mediaButton'>
+    <img id='ytCard' align='middle' src='../assets/YouTube.png' ng-model='showyt' ng-init='showyt = false' ng-mouseenter='showyt = !showyt'></a>
+    <div ng-animate="'animate'">
+      <div ng-if='showyt' >
+        <div ng-animate="'animate'" ng-repeat='youtube in youtubeLinks'> <div>Posted by: {{youtube.name}}</div>
+        <iframe  width='90%' height='315' ng-src='{{ytTrustSrc(youtube.text)}}'  frameborder='0' allowfullscreen onended='window.ended()'></iframe> 
+        <img src='../trash.png' class='youTrash' ng-click='remove(youtube, true, false)'>
       </div>
     </div>
   </div>
+</div>
 
-  <form ng-submit="addMessage()" align='middle'>
-    <input type="text" id="messageInput" placeholder="Message..." ng-submit="addMessage()" ng-model="messageText"/>
-    <button class="btn waves-effect waves-light" id='messageSubmitBtn' type="submit" name="action">
-      <i class="material-icons">send</i>
+<div ng-if='soundcloudLinks.length'>
+  <a class='waves-effect waves-light btn mediaButton'>
+    <img align='middle' src='../assets/soundcloud.png' ng-model='showsc' ng-init='showsc = false' ng-mouseenter='showsc = !showsc'></a>
+    <div >
+      <div ng-if='showsc'>
+        <div ng-repeat='soundcloudlink in soundcloudLinks' id='soundclod'>  <div>Posted by: {{soundcloudlink.name}}</div>
+        <iframe width='80%' height='166' scrolling='no' frameborder='no' ng-src='{{scTrustSrc(soundcloudlink.text)}}'></iframe>
+        <img src='../trash.png' class='soundTrash' ng-click='remove(soundcloudlink, false, true)'>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+  <a href="#" ng-click='helpView = !helpView' ng-init='helpView = false'>Give feedback/comments/etc...</a>
+  <div align='middle' ng-if='helpView'>
+  <div ng-init='showHelp = true'>{{response}}</div>
+  <form ng-submit='submitFeedback()' ng-if='showHelp'>
+    <textarea type='text' id='feedbackTxtArea' ng-model='$parent.feedbackText' ng-submit='submitFeedback()' placeholder='Please provide me with feedback'></textarea>
+      <button class='btn waves-effect waves-light' type='submit' name='action'  id='feedabackBtn'>
+      <i class='material-icons'>send</i>
     </button>
   </form>
-
-  <div id="youTube" ng-if="youtubeLinks.length">
-    
-      <a class="waves-effect waves-light btn mediaButton">
-      <img id='ytCard' align='middle' src="../assets/YouTube.png" ng-model='showyt' ng-init='showyt = false' ng-click='showyt = !showyt'></a>
-  <div>
-      <div ng-if='showyt'>
-        <div ng-repeat="youtube in youtubeLinks"> <div>Posted by: {{youtube.name}}</div>
-        <iframe width="90%" height="315" ng-src="{{ytTrustSrc(youtube.text)}}"  frameborder="0" allowfullscreen onended="window.ended()"></iframe> 
-        <img src="../trash.png" class="youTrash" ng-click="remove(youtube, true, false)">
-      </div>
-    </div>
-
-
   </div>
 
-</div>
-
-<div ng-if="soundcloudLinks.length">
-  
-
-<a class="waves-effect waves-light btn mediaButton">
-    <img align='middle' src="../assets/soundcloud.png" ng-model='showsc' ng-init='showsc = false' ng-click='showsc = !showsc'></a>
-<div >
-    <div ng-if='showsc'>
-
-      <div ng-repeat="soundcloudlink in soundcloudLinks" id="soundclod">  <div>Posted by: {{soundcloudlink.name}}</div>
-      <iframe width="80%" height="166" scrolling="no" frameborder="no" ng-src="{{scTrustSrc(soundcloudlink.text)}}"></iframe>
-      <img src="../trash.png" class="soundTrash" ng-click="remove(soundcloudlink, false, true)">
-    </div>
-  </div>
-
-</div>
-
-</div>
 
 </div>
 
