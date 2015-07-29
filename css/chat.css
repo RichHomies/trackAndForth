@@ -33,30 +33,16 @@ input {
   font-size: 24px;
 }
 
-.animate-enter, 
-.animate-leave
-{ 
-    -webkit-transition: 1025ms cubic-bezier(0.230, 1.000, 0.320, 1.000) all;
-    -moz-transition: 1025ms cubic-bezier(0.230, 1.000, 0.320, 1.000) all;
-    -ms-transition: 1025ms cubic-bezier(0.230, 1.000, 0.320, 1.000) all;
-    -o-transition: 1025ms cubic-bezier(0.230, 1.000, 0.320, 1.000) all;
-    transition: 1025ms cubic-bezier(0.230, 1.000, 0.320, 1.000) all;
-} 
- 
-.animate-enter {
-    top: -100%;
-}
-.animate-enter.animate-enter-active {
-    top: 0;
-}
- 
-.animate-leave {
-    top: 0;
-}
-.animate-leave.animate-leave-active{
-    top: 100%;
+/* The starting CSS styles for the enter animation */
+.fade.ng-enter {
+  transition:0.5s linear all;
+  opacity:0;
 }
 
+/* The finishing CSS styles for the enter animation */
+.fade.ng-enter.ng-enter-active {
+  opacity:1;
+}
 
 .mediaButton {
   background-color: white;
@@ -84,7 +70,7 @@ input {
   #messagesDiv {
     background-color: white;
     overflow: auto;
-    height: 230px;
+    height: 460px;
     width: 100%;
     padding: 10px;
     padding-left: 0px;
@@ -122,14 +108,14 @@ input {
     float:right;
   }
 
-#feedbackTxtArea {
-  width: 80%;
-  height: 6rem;
-}
+  #feedbackTxtArea {
+    width: 80%;
+    height: 6rem;
+  }
 
-#feedabackBtn {
-  vertical-align: top;
-}
+  #feedabackBtn {
+    vertical-align: top;
+  }
   #messageInput {
     width: 76%;
   }
@@ -191,7 +177,7 @@ input {
     font-weight: 400;
     src: local('Material Icons'), local('MaterialIcons-Regular'), url(https://fonts.gstatic.com/s/materialicons/v7/2fcrYFNaTjcS6g4U3t-Y5UEw0lE80llgEseQY3FEmqw.woff2) format('woff2');
   }
-
+ 
   .material-icons {
     font-family: 'Material Icons';
     font-weight: normal;

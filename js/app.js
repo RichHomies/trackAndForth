@@ -2,7 +2,7 @@
 
 var app = angular.module("chatApp", ["firebase", "luegg.directives", 'ui.router', 'ngSanitize'])
 
-.config(function($stateProvider, $urlRouterProvider){
+.config(function($stateProvider, $urlRouterProvider, $compileProvider){
 
   // For any unmatched url, send to /route1
   $urlRouterProvider.otherwise("/firebase");
@@ -34,6 +34,9 @@ var app = angular.module("chatApp", ["firebase", "luegg.directives", 'ui.router'
     templateUrl: "views/chatRoom.html",
     controller : "ChatCtrl"
   });
+
+  $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|chrome-extension):/);
+
 })
 .run(function(){
   chrome.browserAction.setIcon({path:"assets/diamond.png"});
@@ -158,9 +161,9 @@ return {
 
 })
 
-.controller("ChatCtrl", ["$scope", "$firebaseArray", "User", "$state", "$sce", "$http",
+.controller("ChatCtrl", ["$scope", "$firebaseArray", "User", "$state", "$sce", "$http", "$anchorScroll", "$location",
   // we pass our new chatMessages factory into the controller
-  function($scope, $firebaseArray, User, $state, $sce, $http) {
+  function($scope, $firebaseArray, User, $state, $sce, $http, $anchorScroll, $location) {
     var obj = User.getRef();
 
     var mapArray = function(arr) {
@@ -226,7 +229,8 @@ return {
       obj.ref.push({
         name: $scope.name, 
         text: $scope.messageText, 
-        timeStamp: ts
+        timeStamp: ts,
+        musicSource: false
       });
 
       // reset the message input
@@ -291,6 +295,11 @@ return {
       $scope.showHelp = false;
 
      }
+
+     $scope.hrefTag = function(href){
+      return '#' + $sce.trustAsResourceUrl(href);
+     }
+
 
   }])
 
@@ -439,6 +448,17 @@ return {
       scope.$emit('LastRepeaterElement');
     }
   };
+})
+.directive('scrollIf', function () {
+  return function (scope, element, attributes) {
+    setTimeout(function () {
+      if (scope.$eval(attributes.scrollIf)) {
+        // window.scrollTo(0, element[0].offsetTop - 250);
+        var elem = document.getElementById(attributes.id).parentElement;
+        elem.scrollIntoView();
+      }
+    });
+  }
 });
 
 

@@ -50,6 +50,7 @@ var contextMenuHandlerPushSongToFirebase = function(song){
   chrome.storage.sync.get(obj, function(localStorageObject){
     var ytref = new Firebase(localStorageObject.firebaseRef + "/youtube");
     var scref = new Firebase(localStorageObject.firebaseRef + "/soundcloud");
+    var ref = new Firebase(localStorageObject.firebaseRef + "/chat");
     var id;
     var ts = new Date();
     ts = ts.toString();
@@ -58,24 +59,38 @@ var contextMenuHandlerPushSongToFirebase = function(song){
     if(youtubeCheck[1].substring(0, 7) === 'youtube'){
       id = song.split('=');
       id = id[1];
-      pushToFbase(ytref, id, ts);
+      pushToFbase(ytref, 'yt', id, ts, ref);
     }
 
     var soundcloudCheck = song.split('//');
     soundcloudCheck = soundcloudCheck[1].split('.');
 
     if(soundcloudCheck[0] === 'soundcloud'){
-      pushToFbase(scref, song, ts);
+      pushToFbase(scref,'sc', song, ts, ref);
     }
   });
 };
 
-var pushToFbase = function(ref, id, ts){
+var pushToFbase = function(ref, source, id, ts, chatRef){
   if(nameString){
     ref.push({
       name: nameString, 
       text: id, 
       timeStamp: ts
+    });
+    pushToFbaseChat(source, id, ts, chatRef);
+  } else {
+    alert('you are not logged in');
+  }
+};
+
+var pushToFbaseChat = function(source, id, ts, chatRef){
+  if(nameString){
+    chatRef.push({
+      name: nameString, 
+      text: id, 
+      timeStamp: ts, 
+      musicSource: source
     });
   } else {
     alert('you are not logged in');
