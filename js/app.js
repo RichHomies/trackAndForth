@@ -1,4 +1,4 @@
-
+//Sign in is not working
 
 var app = angular.module("chatApp", ["firebase", "luegg.directives", 'ui.router', 'ngSanitize'])
 
@@ -38,8 +38,35 @@ var app = angular.module("chatApp", ["firebase", "luegg.directives", 'ui.router'
   $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|chrome-extension):/);
 
 })
-.run(function(){
+.run(function(User, $state){
   chrome.browserAction.setIcon({path:"assets/diamond.png"});
+  User.fetchFromLocalStorage(function(localStorageObject){
+      var refExists = localStorageObject.firebaseRef;
+      refExists = '' + refExists; 
+      console.log(refExists);
+      if(refExists){
+        var firebaseIdentifier = refExists.split('.');
+        firebaseIdentifier = firebaseIdentifier[1];
+        if(firebaseIdentifier === 'firebaseio'){
+          User.setStr(refExists);
+          console.log('run check ref exists');
+          var userIsLoggedIn = User.isAuth();
+          if(userIsLoggedIn){
+            User.setAuthObj(userIsLoggedIn);
+            console.log('run check user is logged in');
+            $state.go('messages');
+          } else {
+            console.log('run check user is not logged in');
+            $state.go('signIn');
+          }
+        }
+      } else {
+        console.log('run check, fb ref does not exist');
+        $state.go('firebase');
+      }
+
+    });
+
 })
 .factory('User', function ($state, $http) {
   var str = '';
@@ -116,6 +143,7 @@ var initRef = function(){
   userRef = new Firebase(str + '/usersInfo');
   youTubeRef = new Firebase(str + "/youtube");
   soundCloudRef = new Firebase(str + "/soundcloud");
+  favoriteMusicRef = new Firebase(str + 'favoriteMusic/' + ref.getAuth().uid);
 }
 
 var setStr = function(data){
@@ -128,7 +156,8 @@ var getRef = function(){
     ref : ref,
     userRef : userRef,
     youTubeRef : youTubeRef,
-    soundCloudRef : soundCloudRef
+    soundCloudRef : soundCloudRef,
+    favoriteMusicRef : favoriteMusicRef
   };
 }
 
@@ -165,14 +194,10 @@ return {
   // we pass our new chatMessages factory into the controller
   function($scope, $firebaseArray, User, $state, $sce, $http, $anchorScroll, $location) {
     var obj = User.getRef();
+    console.log(obj);
 
     var mapArray = function(arr) {
-      console.log('mapArray console log arr ', arr);
-      console.log('mapArray console log arr[0] ', arr[0]);
-
       var output = [[arr[0]]];
-      console.log('mapArray console log output ', output);
-
       var outerIndex = 0;
       var current = output[0].name;
       for(var i = 0; i < arr.length; i++){
@@ -192,8 +217,9 @@ return {
     $scope.messages = $firebaseArray(obj.ref);
     $scope.youtubeLinks = $firebaseArray(obj.youTubeRef);
     $scope.soundcloudLinks = $firebaseArray(obj.soundCloudRef);
+    $scope.favorites = $firebaseArray(obj.favoriteMusicRef);
 
-   $scope.messages.$loaded()
+    $scope.messages.$loaded()
     .then(function(data) {
       console.log('loaded ',$scope.messages === data); // true
       $scope.messages = data;
@@ -203,7 +229,6 @@ return {
     });
 
     $scope.$on('LastRepeaterElement', function(){
-      console.log('good to go');
     });
 
     User.fetchUserObjFromFirebase(function(nameString){
@@ -237,7 +262,7 @@ return {
       $scope.messageText = "";
     };
 
-    $scope.remove = function(url, yt, sc){
+    $scope.remove = function(url, yt, sc, fav){
       var list;
       if(yt){
         list = $scope.youtubeLinks;
@@ -247,6 +272,13 @@ return {
       if(sc){
         list = $scope.soundcloudLinks;
         console.log('sc');
+        console.log(list);
+        console.log(url);
+      }
+
+      if(fav){
+        list = $scope.favorites;
+        console.log('fav');
         console.log(list);
         console.log(url);
       }
@@ -277,12 +309,9 @@ return {
       $state.go('firebase');
     }
 
-     $scope.submitFeedback = function(){
+    $scope.submitFeedback = function(){
       var submitRef = new Firebase('https://feedbackapp.firebaseio.com/');
       var ts = new Date();
-      console.log($scope.name);
-      console.log($scope.feedbackText);
-
       submitRef.push({
         name: $scope.name, 
         text: $scope.feedbackText, 
@@ -294,11 +323,20 @@ return {
       $scope.$apply();
       $scope.showHelp = false;
 
-     }
+    }
 
-     $scope.hrefTag = function(href){
+    $scope.hrefTag = function(href){
       return '#' + $sce.trustAsResourceUrl(href);
-     }
+    }
+
+    $scope.addToFavorites = function(song , source){
+      obj.favoriteMusicRef.push({
+        song : song,
+        source: source,
+        name: $scope.name
+      });
+    }
+
 
 
   }])
@@ -306,11 +344,6 @@ return {
 .controller("RegisterCtrl", ["$scope", "$firebaseArray", "$state", "User",
   function($scope, $firebaseArray, $state, User){
     $scope.$apply();
-    var userIsLoggedIn = User.isAuth();
-    if(userIsLoggedIn){
-      User.setAuthObj(userIsLoggedIn);
-      $state.go('messages');
-    }
 
     $scope.registerUser = function(username, password) {
       $scope.registerEmail = '';
@@ -345,12 +378,6 @@ return {
 
 .controller("SignInCtrl", ["$scope", "$firebaseArray", "$state", "User",
   function($scope, $firebaseArray, $state, User){
-
-    var userIsLoggedIn = User.isAuth();
-    if(userIsLoggedIn){
-      User.setAuthObj(userIsLoggedIn);
-      $state.go('messages');
-    }
 
     $scope.signIn = function(username, password) {
       $scope.signInEmail = '';
@@ -387,21 +414,6 @@ return {
   }])
 .controller("firebaseCtrl", ["$scope", "$firebaseArray", "$state", "User",
   function($scope, $firebaseArray, $state, User){
-    User.fetchFromLocalStorage(function(localStorageObject){
-      var refExists = localStorageObject.firebaseRef;
-      refExists = '' + refExists; 
-      console.log(refExists);
-      
-      if(refExists){
-        var firebaseIdentifier = refExists.split('.');
-        firebaseIdentifier = firebaseIdentifier[1];
-        if(firebaseIdentifier === 'firebaseio'){
-          User.setStr(refExists);
-          $state.go('signIn');
-        }
-      } else {
-        console.log('fb ref does not exist');
-      }
 
       $scope.update = function(){
         var temp = $scope.stringRef;
@@ -434,7 +446,9 @@ return {
         }
 
       }
-    });
+
+
+
 }])
 .controller("helpCtrl", ["$scope", "$firebaseArray", "$state", "User",
   function($scope, $firebaseArray, $state, User){
