@@ -1,4 +1,5 @@
-//Sign in is not working
+//issue with initiating the firebase favorite reference.
+//currently sets ref if, if ref exists. However, it should only do so if signed in.
 
 var app = angular.module("chatApp", ["firebase", "luegg.directives", 'ui.router', 'ngSanitize'])
 
@@ -41,31 +42,32 @@ var app = angular.module("chatApp", ["firebase", "luegg.directives", 'ui.router'
 .run(function(User, $state){
   chrome.browserAction.setIcon({path:"assets/diamond.png"});
   User.fetchFromLocalStorage(function(localStorageObject){
-      var refExists = localStorageObject.firebaseRef;
-      refExists = '' + refExists; 
-      console.log(refExists);
-      if(refExists){
-        var firebaseIdentifier = refExists.split('.');
-        firebaseIdentifier = firebaseIdentifier[1];
-        if(firebaseIdentifier === 'firebaseio'){
-          User.setStr(refExists);
-          console.log('run check ref exists');
-          var userIsLoggedIn = User.isAuth();
-          if(userIsLoggedIn){
-            User.setAuthObj(userIsLoggedIn);
-            console.log('run check user is logged in');
-            $state.go('messages');
-          } else {
-            console.log('run check user is not logged in');
-            $state.go('signIn');
-          }
+    var refExists = localStorageObject.firebaseRef;
+    refExists = '' + refExists; 
+    if(refExists){
+      var firebaseIdentifier = refExists.split('.');
+      firebaseIdentifier = firebaseIdentifier[1];
+      if(firebaseIdentifier === 'firebaseio'){
+        User.setStr(refExists);
+        User.initRef();
+        console.log('run check ref exists');
+        var userIsLoggedIn = User.isAuth();
+        if(userIsLoggedIn){
+          User.setAuthObj(userIsLoggedIn);
+          User.initAuthDependentRef();
+          console.log('run check user is logged in');
+          $state.go('messages');
+        } else {
+          console.log('run check user is not logged in');
+          $state.go('signIn');
         }
-      } else {
-        console.log('run check, fb ref does not exist');
-        $state.go('firebase');
       }
+    } else {
+      console.log('run check, fb ref does not exist');
+      $state.go('firebase');
+    }
 
-    });
+  });
 
 })
 .factory('User', function ($state, $http) {
@@ -74,6 +76,7 @@ var app = angular.module("chatApp", ["firebase", "luegg.directives", 'ui.router'
   var userRef;
   var youTubeRef;
   var soundCloudRef;
+  var favoriteMusicRef;
   var authDataObj;
   var name;
 
@@ -143,12 +146,14 @@ var initRef = function(){
   userRef = new Firebase(str + '/usersInfo');
   youTubeRef = new Firebase(str + "/youtube");
   soundCloudRef = new Firebase(str + "/soundcloud");
+}
+
+var initAuthDependentRef =  function(){
   favoriteMusicRef = new Firebase(str + 'favoriteMusic/' + ref.getAuth().uid);
 }
 
 var setStr = function(data){
   str = data;
-  initRef();
 }
 
 var getRef = function(){
@@ -185,7 +190,9 @@ return {
   soundCloudRef : soundCloudRef,
   setStr : setStr,
   getRef : getRef,
-  fetchFromLocalStorage : fetchFromLocalStorage
+  fetchFromLocalStorage : fetchFromLocalStorage, 
+  initRef : initRef,
+  initAuthDependentRef : initAuthDependentRef
 };
 
 })
@@ -213,11 +220,44 @@ return {
       return output;
     }
 
+    SC.initialize({
+      client_id: 'aa3e10d2de1e1304e62f07feb898e745'
+    });
+
+
+
     $scope.name;
     $scope.messages = $firebaseArray(obj.ref);
     $scope.youtubeLinks = $firebaseArray(obj.youTubeRef);
     $scope.soundcloudLinks = $firebaseArray(obj.soundCloudRef);
     $scope.favorites = $firebaseArray(obj.favoriteMusicRef);
+
+    var getInfo = function(track_url, cb){
+      console.log(track_url);
+      var url = "https://api.soundcloud.com/resolve?url=" + track_url + "&client_id=aa3e10d2de1e1304e62f07feb898e745&format=json&_status_code_map[302]=200";
+      $.getJSON(url, function(data) {
+        $.getJSON(data.location, function(response){
+          console.log(response);
+        });
+      });
+    }
+
+
+    $scope.messages.$loaded()
+    .then(function(data) {
+      var songData; 
+      for(var i = 0; i < data.length; i++){
+        if(data[i].musicSource === 'sc'){
+          getInfo(data[i].text, console.log);
+          // console.log(songData);
+          // data[i].songData = songData;
+        }
+      }
+    })
+    .catch(function(error) {
+      console.log("Error:", error);
+    });
+
 
     $scope.messages.$loaded()
     .then(function(data) {
@@ -309,9 +349,11 @@ return {
       $state.go('firebase');
     }
 
-    $scope.submitFeedback = function(){
+    $scope.submitFeedback = function(feedback){
       var submitRef = new Firebase('https://feedbackapp.firebaseio.com/');
       var ts = new Date();
+      console.log($scope);
+      console.log(dataObj);
       submitRef.push({
         name: $scope.name, 
         text: $scope.feedbackText, 
@@ -322,6 +364,7 @@ return {
       $scope.response = 'Thanks!';
       $scope.$apply();
       $scope.showHelp = false;
+      $scope.feedbackText = '';
 
     }
 
@@ -337,13 +380,10 @@ return {
       });
     }
 
-
-
   }])
 
 .controller("RegisterCtrl", ["$scope", "$firebaseArray", "$state", "User",
   function($scope, $firebaseArray, $state, User){
-    $scope.$apply();
 
     $scope.registerUser = function(username, password) {
       $scope.registerEmail = '';
@@ -362,6 +402,7 @@ return {
               $scope.$apply();
             } else {
               User.setAuthObj(authDataFb);
+              User.initAuthDependentRef();
               console.log('registerCtrl ' + User.getAuthObj().toString());
               $state.go('name');
             }
@@ -390,6 +431,7 @@ return {
         } else {
           console.log(authData);
           User.setAuthObj(authData);
+          User.initAuthDependentRef();
           $state.go('messages');
         }
       });
@@ -415,32 +457,33 @@ return {
 .controller("firebaseCtrl", ["$scope", "$firebaseArray", "$state", "User",
   function($scope, $firebaseArray, $state, User){
 
-      $scope.update = function(){
-        var temp = $scope.stringRef;
-        temp = temp.split('.');
-        if(temp[temp.length - 2] === 'firebaseio'){
-          User.setStr($scope.stringRef);
-          $state.go('signIn');
-        } 
+    $scope.update = function(){
+      var temp = $scope.stringRef;
+      temp = temp.split('.');
+      if(temp[temp.length - 2] === 'firebaseio'){
+        User.setStr($scope.stringRef);
+        User.initRef();
+        $state.go('signIn');
+      } 
+      $scope.stringRef = '';
+    }; 
+
+    $scope.help = function(){
+      $state.go('help');
+    }       
+
+    $scope.saveToLocalStorage =  function(){
+      var obj = {};
+      var temp = $scope.stringRef;
+      temp = temp.split('.');
+      if(temp[temp.length - 2] === 'firebaseio'){
+        obj['firebaseRef'] = $scope.stringRef;
         $scope.stringRef = '';
-      }; 
-
-      $scope.help = function(){
-        $state.go('help');
-      }       
-
-      $scope.saveToLocalStorage =  function(){
-        var obj = {};
-        var temp = $scope.stringRef;
-        temp = temp.split('.');
-        if(temp[temp.length - 2] === 'firebaseio'){
-          obj['firebaseRef'] = $scope.stringRef;
-          $scope.stringRef = '';
-          chrome.storage.sync.set(obj, function(){
-            console.log('saved firebase reference');
-            $state.go('signIn');
-          });
-        } else  {
+        chrome.storage.sync.set(obj, function(){
+          console.log('saved firebase reference');
+          $state.go('signIn');
+        });
+      } else  {
           //set error
           $scope.error = 'invalid firebase reference';
         }
@@ -449,7 +492,7 @@ return {
 
 
 
-}])
+    }])
 .controller("helpCtrl", ["$scope", "$firebaseArray", "$state", "User",
   function($scope, $firebaseArray, $state, User){
     $scope.goBack =  function(){

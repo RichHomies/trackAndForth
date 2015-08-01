@@ -101,17 +101,20 @@
 
 
 
-
+<!-- 
   <a href="#" ng-click='helpView = !helpView' ng-init='helpView = false'>Give feedback/comments/etc...</a>
   <div align='middle' ng-if='helpView' >
+
     <div ng-init='showHelp = true'>{{response}}</div>
-    <form ng-submit='submitFeedback()' ng-if='showHelp' scroll-if='showHelp' id='helpForm'>
-      <textarea type='text' id='feedbackTxtArea' ng-model='$parent.feedbackText' ng-submit='submitFeedback()' placeholder='Please provide me with feedback'></textarea>
-      <button class='btn waves-effect waves-light' type='submit' name='action'  id='feedabackBtn'>
-        <i class='material-icons'>send</i>
-      </button>
+
+    <form  ng-submit='submitFeedback()' ng-if='showHelp' scroll-if='showHelp' id='helpForm'>
+
+    <div>
+      <input type='text' id='feedbackTxtArea' ng-model='$parent.feedbackText' ng-submit='submitFeedback()' placeholder='Please provide me with feedback'>
+    </div>
+
     </form>
-  </div>
+  </div> -->
 
 
 </div>

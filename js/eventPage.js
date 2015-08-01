@@ -85,18 +85,48 @@ var pushToFbase = function(ref, source, id, ts, chatRef){
 };
 
 var pushToFbaseChat = function(source, id, ts, chatRef){
+
   if(nameString){
-    chatRef.push({
-      name: nameString, 
-      text: id, 
-      timeStamp: ts, 
-      musicSource: source
-    });
+    if(source === 'sc'){
+      var url = "https://api.soundcloud.com/resolve?url=" + id + "&client_id=aa3e10d2de1e1304e62f07feb898e745&format=json&_status_code_map[302]=200";
+      $.getJSON(url, function(data) {
+        $.getJSON(data.location, function(response){
+          console.log(response);
+          chatRef.push({
+            name: nameString, 
+            text: id, 
+            timeStamp: ts, 
+            musicSource: source,
+            songData: response
+          });
+        });
+      });
+    } else {
+      chatRef.push({
+        name: nameString, 
+        text: id, 
+        timeStamp: ts, 
+        musicSource: source,
+        songData: null
+      });
+    }
   } else {
     alert('you are not logged in');
   }
+
 };
 
+
+var playSoundcloud = function (song){
+  var widgetIframe = document.getElementById('sc-widget'),
+  newSoundUrl = "https://w.soundcloud.com/player/?url=" + song + "&amp;auto_play=true&amp;hide_related=false&amp;show_comments=true&amp;show_user=true&amp;show_reposts=false&amp;visual=true";
+  widgetIframe.src = newSoundUrl;
+}
+
+var stopSoundcloud = function (){
+  var widgetIframe = document.getElementById('sc-widget');
+  widgetIframe.src = '';
+}
 
 
 
