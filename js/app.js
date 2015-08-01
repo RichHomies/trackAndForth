@@ -380,6 +380,16 @@ return {
       });
     }
 
+    $scope.playSong = function(song){
+      chrome.extension.getBackgroundPage().playSoundcloud(song);
+    }
+
+    $scope.stopSong = function(){
+      chrome.extension.getBackgroundPage().stopSoundcloud();
+    }
+
+
+
   }])
 
 .controller("RegisterCtrl", ["$scope", "$firebaseArray", "$state", "User",

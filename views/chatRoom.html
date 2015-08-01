@@ -8,7 +8,9 @@
   <div align='middle'><i class='medium material-icons'>forum</i></div>
   <div id='messagesDiv' scroll-glue='!glued'>
     <div ng-repeat='message in messages | orderBy: reverse' emit-last-repeater-element>
-      <div class='card-panel word' ng-click='show = !show'>
+      <div class='card-panel word' >
+      
+      <!-- <div class='card-panel word' ng-click='show = !show'> -->
         <!-- displays the user name -->
         <strong>{{message.name}} | </strong>
         <!-- if the message is text display the user's chat message-->
@@ -26,12 +28,19 @@
         <span ng-if='message.musicSource === "sc"'>
           <span ng-model='showSoundCloud' ng-init='showSoundCloud = false' ng-click='showSoundCloud = !showSoundCloud'> <a href="#">shared a song from soundcloud.</a></span> 
 
-          <div ng-if='showSoundCloud' scroll-if="showSoundCloud" id='{{message.text}}'>
-            <iframe width='90%' height='166' scrolling='no' frameborder='no' ng-src='{{scTrustSrc(message.text)}}'></iframe>
+          <div ng-if='showSoundCloud' scroll-if="showSoundCloud" id='{{message.text}}' align='middle'>
+            <!-- <iframe width='90%' height='166' scrolling='no' frameborder='no' ng-src='{{scTrustSrc(message.text)}}'></iframe> -->
+            <a href="#">
+              <img src="{{message.songData.artwork_url}}" ng-click='playSong(message.text)'>
+              <div>{{message.songData.title}}</div>
+              <a href="#" ng-click='playSong(message.text)'><i class="material-icons">play_arrow</i></a>
+              <a href="#" ng-click='stopSong()'><i class="material-icons">stop</i></a>
+            </a>
             <a href="#" ng-click='addToFavorites(message.text, message.musicSource)'><i class="material-icons">queue_music</i></a>
           </div>
         </span>
         <!--time -->
+
         <div ng-model='show' ng-init='show = false'>
           <div ng-if='show'>{{formatTime(message.timeStamp)}}</div>
         </div> 
