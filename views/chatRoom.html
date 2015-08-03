@@ -8,20 +8,20 @@
   <div align='middle'><i class='medium material-icons'>forum</i></div>
   <div id='messagesDiv' scroll-glue='!glued'>
     <div ng-repeat='message in messages | orderBy: reverse' emit-last-repeater-element>
-      <div class='card-panel word' >
+      <!-- <div class='card-panel word' > -->
       
-      <!-- <div class='card-panel word' ng-click='show = !show'> -->
+      <div class='card-panel word' ng-click='show = !show'>
         <!-- displays the user name -->
-        <strong>{{message.name}} | </strong>
+        <strong>{{message.name}} </strong>| {{formatTime(message.timeStamp)}} |
+
         <!-- if the message is text display the user's chat message-->
         <span ng-if='!message.musicSource'>{{message.text}}</span>
         <!-- else, if the message is from youtube, show the youtube player in chat -->
         <span ng-if='message.musicSource === "yt"'>
           <span ng-model='showVideo' ng-init='showVideo = false' ng-click='showVideo = !showVideo; scroll(message.text)'> <a href="#">shared a song from youtube.</a></span>   
-          
           <div ng-if='showVideo'  scroll-if="showVideo" id='{{message.text}}'>
             <iframe  width='90%' height='315' ng-src='{{ytTrustSrc(message.text)}}' frameborder='0' allowfullscreen onended='window.ended()'></iframe> 
-            <a href="#" ng-click='addToFavorites(message.text, message.musicSource)'><i class="material-icons">queue_music</i></a>
+            <a href="#" ng-click='addToFavorites(message.text, message.musicSource, null)'><i class="material-icons">queue_music</i></a>
           </div>
         </span>
         <!-- else, if the message is from soundcloud, show the soundcloud player in chat -->
@@ -34,16 +34,12 @@
               <img src="{{message.songData.artwork_url}}" ng-click='playSong(message.text)'>
               <div>{{message.songData.title}}</div>
               <a href="#" ng-click='playSong(message.text)'><i class="material-icons">play_arrow</i></a>
+              <a href="#" ng-click='pauseSong()'><i class="material-icons">pause</i></a>
               <a href="#" ng-click='stopSong()'><i class="material-icons">stop</i></a>
             </a>
-            <a href="#" ng-click='addToFavorites(message.text, message.musicSource)'><i class="material-icons">queue_music</i></a>
+            <a href="#" ng-click='addToFavorites(message.text, message.musicSource, message.songData)'><i class="material-icons">queue_music</i></a>
           </div>
         </span>
-        <!--time -->
-
-        <div ng-model='show' ng-init='show = false'>
-          <div ng-if='show'>{{formatTime(message.timeStamp)}}</div>
-        </div> 
 
 
       </div>
@@ -57,30 +53,37 @@
     </button>
   </form>
 
-  <div ng-if='favorites.length'>
+  <div ng-if='favorites.length' id='fav'>
     <a ng-click='showfavorites = !showfavorites' class='waves-effect waves-light btn'>
-<!--       <img align='middle' id='diamondTeal'src='../assets/diamond-teal-64.png' ng-model='showfavorites' ng-init='showfavorites = false' >-->
+      <!--       <img align='middle' id='diamondTeal'src='../assets/diamond-teal-64.png' ng-model='showfavorites' ng-init='showfavorites = false' >-->
       <i class="large material-icons" ng-model='showfavorites' ng-init='showfavorites = false'>queue_music</i></a>
       <div >
         <div ng-if='showfavorites' scroll-if='showfavorites' id='favorites'>
           <div ng-repeat='favorite in favorites' id='favorites' >
-            <div>Contributed by: {{favorite.name}}</div>
-          
-            <div ng-if='favorite.source === "sc"'>
-            <iframe width='80%' height='166' scrolling='no' frameborder='no' ng-src='{{scTrustSrc(favorite.song)}}'></iframe>
-            <img src='../trash.png' class='soundTrash' ng-click='remove(favorite, false, false, true)'>
+
+            <div ng-if='favorite.source === "sc"' class='card-panel word scCard' >
+              <div align='middle'>
+                <div>Shared by: {{favorite.name}}</div>
+                <img ng-src="{{favorite.songData.artwork_url}}" ng-click='playSong(favorite.text)'>
+                <div>{{message.songData.title}}</div>
+                <a href="#" ng-click='playSong(favorite.song)'><i class="material-icons">play_arrow</i></a>
+                <a href="#" ng-click='pauseSong()'><i class="material-icons">pause</i></a>
+                <a href="#" ng-click='stopSong()'><i class="material-icons">stop</i></a>
+                <img src='../trash.png' class='trash' ng-click='remove(favorite, false, false, true)'>
+              </div>
             </div>
 
             <div ng-if='favorite.source === "yt"'>
-            <iframe width='90%' height='315' ng-src='{{ytTrustSrc(favorite.song)}}' frameborder='0' allowfullscreen onended='window.ended()'></iframe> 
-            <img src='../trash.png' class='youTrash' ng-click='remove(favorite, false, false, true)'>
+              <iframe width='90%' height='315' ng-src='{{ytTrustSrc(favorite.song)}}' frameborder='0' allowfullscreen onended='window.ended()'></iframe> 
+              <img src='../trash.png' class='youTrash' ng-click='remove(favorite, false, false, true)'>
             </div>
+
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <div id='youTube' ng-if='youtubeLinks.length'>
+<!--   <div id='youTube' ng-if='youtubeLinks.length'>
     <a ng-click='showyt = !showyt'  ng-model='showyt' class='waves-effect waves-light btn mediaButton'>
       <img id='ytCard' align='middle' src='../assets/YouTube.png' ng-init='showyt = false' ></a>
       <div>
@@ -104,7 +107,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </div> -->
 
 
 

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="js/soundcloudPlayerApi.js"></script>
+</head>
+<body>
+<iframe id='sc-widget' width='80%' height='166' scrolling='no' frameborder='no' src='https://w.soundcloud.com/player/?url=https://soundcloud.com/jaipaul/jai-paul-jasmine&amp;auto_play=true&amp;hide_related=false&amp;show_comments=true&amp;show_user=true&amp;show_reposts=false&amp;visual=true'></iframe>
+
+
+
+<script type="text/javascript">
+  var widgetIframe = document.getElementById('sc-widget');
+  widget1         = SC.Widget(widgetIframe);
+  widget1.bind(SC.Widget.Events.FINISH, function() {
+    console.log('done');
+  });
+</script>
+</body>
+</html>
+
+

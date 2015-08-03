@@ -1,7 +1,7 @@
 var messagesRef;
 var str;
 var nameString;
-
+var currentIcon = 'default'; 
 
 var setRef = function(ref){
   messageRef = new Firebase(ref);
@@ -16,7 +16,7 @@ var setEvents = function(){
     var elapsedTime = (timeStampAtTimeZero - timeStampAtNow)/1000;
     var myMessage =  message.name === nameString;
     if(elapsedTime < 60*5 && !myMessage){
-      chrome.browserAction.setIcon({path:"assets/diamond_red.png"});
+      updateIcon('newMessage');
     }
   });
 };
@@ -114,20 +114,60 @@ var pushToFbaseChat = function(source, id, ts, chatRef){
   }
 };
 
-
-var playSoundcloud = function (song){
-  console.log(song);
-  var widgetIframe = document.getElementById('sc-widget');
-  var newSoundUrl = "https://w.soundcloud.com/player/?url=" + song + "&amp;auto_play=true&amp;hide_related=false&amp;show_comments=true&amp;show_user=true&amp;show_reposts=false&amp;visual=true";
-  widgetIframe.src = newSoundUrl;
+var updateIcon = function (type){
+  
+  if(currentIcon === 'playingSong' && type === 'default'){
+    return;
   }
 
+  if(currentIcon === 'playingSong' && type === 'newMessage') {
+    currentIcon = 'playingSongNewMessage';
+  }
+
+  var iconPaths = {
+    'playingSong' : 'assets/audio.png',
+    'newMessage' : 'assets/diamond_red.png',
+    'default' : 'assets/diamond.png',
+    'playingSongNewMessage' : 'assets/audio_red.png',
+    'stopPlayingSong' : 'assets/diamond.png',
+    'endedSong' : 'assets/diamond.png',
+    'pausePlayingSong' : 'assets/diamond.png'
+  }
+
+  chrome.browserAction.setIcon({path: iconPaths[type]});
+
+  currentIcon = type;
+}
+
+var playSoundcloud = function (song){
+  var widgetIframe = document.getElementById('sc-widget');
+  var newSoundUrl  = "https://w.soundcloud.com/player/?url=" + song + "&amp;auto_play=true&amp;hide_related=false&amp;show_comments=true&amp;show_user=true&amp;show_reposts=false&amp;visual=true";
+  if(currentIcon === 'pausePlayingSong') {
+    widget1          = SC.Widget(widgetIframe);
+    widget1.play();
+  } else  {
+    widgetIframe.src = newSoundUrl;
+  }
+  updateIcon('playingSong');
+  console.log(song);
+}
 
 var stopSoundcloud = function (){
   var widgetIframe = document.getElementById('sc-widget');
   widgetIframe.src = '';
+  updateIcon('stopPlayingSong');
 }
 
+var pauseSoundcloud = function () {
+  var widgetIframe = document.getElementById('sc-widget');
+  widget1          = SC.Widget(widgetIframe);
+  widget1.pause();
+  updateIcon('pausePlayingSong');
+}
 
+var resumeSoundcloud = function () {
+  var widgetIframe = document.getElementById('sc-widget');
+  updateIcon('playingSong');
+}
 
 

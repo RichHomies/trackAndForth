@@ -1,11 +1,7 @@
-//issue with initiating the firebase favorite reference.
-//currently sets ref if, if ref exists. However, it should only do so if signed in.
-
 var app = angular.module("chatApp", ["firebase", "luegg.directives", 'ui.router', 'ngSanitize'])
 
 .config(function($stateProvider, $urlRouterProvider, $compileProvider){
 
-  // For any unmatched url, send to /route1
   $urlRouterProvider.otherwise("/firebase");
   $stateProvider
   .state('home', {
@@ -40,7 +36,7 @@ var app = angular.module("chatApp", ["firebase", "luegg.directives", 'ui.router'
 
 })
 .run(function(User, $state){
-  chrome.browserAction.setIcon({path:"assets/diamond.png"});
+  chrome.extension.getBackgroundPage().updateIcon('default');
   User.fetchFromLocalStorage(function(localStorageObject){
     var refExists = localStorageObject.firebaseRef;
     refExists = '' + refExists; 
@@ -66,7 +62,6 @@ var app = angular.module("chatApp", ["firebase", "luegg.directives", 'ui.router'
       console.log('run check, fb ref does not exist');
       $state.go('firebase');
     }
-
   });
 
 })
@@ -220,18 +215,6 @@ return {
       return output;
     }
 
-    SC.initialize({
-      client_id: 'aa3e10d2de1e1304e62f07feb898e745'
-    });
-
-
-
-    $scope.name;
-    $scope.messages = $firebaseArray(obj.ref);
-    $scope.youtubeLinks = $firebaseArray(obj.youTubeRef);
-    $scope.soundcloudLinks = $firebaseArray(obj.soundCloudRef);
-    $scope.favorites = $firebaseArray(obj.favoriteMusicRef);
-
     var getInfo = function(track_url, cb){
       console.log(track_url);
       var url = "https://api.soundcloud.com/resolve?url=" + track_url + "&client_id=aa3e10d2de1e1304e62f07feb898e745&format=json&_status_code_map[302]=200";
@@ -242,26 +225,18 @@ return {
       });
     }
 
-
-    $scope.messages.$loaded()
-    .then(function(data) {
-      var songData; 
-      for(var i = 0; i < data.length; i++){
-        if(data[i].musicSource === 'sc'){
-          getInfo(data[i].text, console.log);
-          // console.log(songData);
-          // data[i].songData = songData;
-        }
-      }
-    })
-    .catch(function(error) {
-      console.log("Error:", error);
+    SC.initialize({
+      client_id: 'aa3e10d2de1e1304e62f07feb898e745'
     });
 
+    $scope.name;
+    $scope.messages = $firebaseArray(obj.ref);
+    $scope.youtubeLinks = $firebaseArray(obj.youTubeRef);
+    $scope.soundcloudLinks = $firebaseArray(obj.soundCloudRef);
+    $scope.favorites = $firebaseArray(obj.favoriteMusicRef);
 
     $scope.messages.$loaded()
     .then(function(data) {
-      console.log('loaded ',$scope.messages === data); // true
       $scope.messages = data;
     })
     .catch(function(error) {
@@ -298,7 +273,6 @@ return {
         musicSource: false
       });
 
-      // reset the message input
       $scope.messageText = "";
     };
 
@@ -372,11 +346,12 @@ return {
       return '#' + $sce.trustAsResourceUrl(href);
     }
 
-    $scope.addToFavorites = function(song , source){
+    $scope.addToFavorites = function(song , source, songData){
       obj.favoriteMusicRef.push({
         song : song,
         source: source,
-        name: $scope.name
+        name: $scope.name,
+        songData : songData
       });
     }
 
@@ -388,7 +363,9 @@ return {
       chrome.extension.getBackgroundPage().stopSoundcloud();
     }
 
-
+    $scope.pauseSong = function(){
+      chrome.extension.getBackgroundPage().pauseSoundcloud();
+    }    
 
   }])
 
@@ -421,7 +398,7 @@ return {
       });
     };
 
-    $scope.goToSignIn = function(dateString){
+    $scope.goToSignIn = function(){
       $state.go('signIn');
     };
 
@@ -447,7 +424,7 @@ return {
       });
     };
 
-    $scope.goToRegister = function(dateString){
+    $scope.goToRegister = function(){
       $state.go('home');
     };
 
@@ -496,13 +473,9 @@ return {
       } else  {
           //set error
           $scope.error = 'invalid firebase reference';
-        }
-
       }
-
-
-
-    }])
+    }
+}])
 .controller("helpCtrl", ["$scope", "$firebaseArray", "$state", "User",
   function($scope, $firebaseArray, $state, User){
     $scope.goBack =  function(){
@@ -520,7 +493,6 @@ return {
   return function (scope, element, attributes) {
     setTimeout(function () {
       if (scope.$eval(attributes.scrollIf)) {
-        // window.scrollTo(0, element[0].offsetTop - 250);
         var elem = document.getElementById(attributes.id).parentElement;
         elem.scrollIntoView();
       }
