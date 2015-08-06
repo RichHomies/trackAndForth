@@ -3,6 +3,8 @@ var app = angular.module("chatApp", ["firebase", "luegg.directives", 'ui.router'
 .config(function($stateProvider, $urlRouterProvider, $compileProvider){
 
   $urlRouterProvider.otherwise("/firebase");
+
+
   $stateProvider
   .state('home', {
     url: "/",
@@ -140,7 +142,7 @@ var initRef = function(){
   ref = new Firebase(str + "/chat");
   userRef = new Firebase(str + '/usersInfo');
   youTubeRef = new Firebase(str + "/youtube");
-  soundCloudRef = new Firebase(str + "/soundcloud");
+  soundCloudRef = new Firebase(str + "/s oundcloud");
 }
 
 var initAuthDependentRef =  function(){
@@ -259,6 +261,11 @@ return {
 
     $scope.scTrustSrc = function(src) {
       src = "https://w.soundcloud.com/player/?url=" + src + "&color=0066cc";
+      return $sce.trustAsResourceUrl(src);
+    };
+
+    $scope.trustSrc = function(src) {
+      console.log($sce.trustAsResourceUrl(src));
       return $sce.trustAsResourceUrl(src);
     };
 

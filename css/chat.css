@@ -181,15 +181,47 @@ input {
   }
 
   .scCard {
-    width: 30%;
-    margin-left: 175px;
-    margin-top: 10px;
+    width: 95%;
+    margin-left: 12px;
+    margin-top: 12px;
   }
 
   .trash {
     padding-bottom: 5px;
     padding-left: 5px;
   }
+
+  .imgCard {
+    display: inline;
+    width: 30%;
+  }
+
+  .soundCard {
+    width: 50%;
+  }
+  .songInfo {
+    display: inline;
+    width: 60%;
+  }
+
+
+.card-image{ 
+  display:inline-block; 
+  width: 49%; 
+  vertical-align:middle;
+  border-box: box-sizing; 
+}
+
+
+.card-info{
+  display:inline-block; 
+  width: 49%; 
+  vertical-align:middle;
+  border-box: box-sizing; 
+}
+
+
+
 
   @font-face {
     font-family: 'Material Icons';

@@ -4,16 +4,29 @@
   <script src="js/soundcloudPlayerApi.js"></script>
 </head>
 <body>
-<iframe id='sc-widget' width='80%' height='166' scrolling='no' frameborder='no' src='https://w.soundcloud.com/player/?url=https://soundcloud.com/jaipaul/jai-paul-jasmine&amp;auto_play=true&amp;hide_related=false&amp;show_comments=true&amp;show_user=true&amp;show_reposts=false&amp;visual=true'></iframe>
-
+<audio src="https://api.soundcloud.com/tracks/202972853/stream?client_id=aa3e10d2de1e1304e62f07feb898e745" preload="auto" autoplay controls></audio>
+<div>
+  <button onclick="document.getElementById('demo').play()">Play the Audio</button>
+  <button onclick="document.getElementById('demo').pause()">Pause the Audio</button>
+  <button onclick="document.getElementById('demo').volume+=0.1">Increase Volume</button>
+  <button onclick="document.getElementById('demo').volume-=0.1">Decrease Volume</button>
+</div>
+<form id='cool'>
+  <input type='text' id='data'/>
+  <input type='submit'/>
+</form>
 
 
 <script type="text/javascript">
-  var widgetIframe = document.getElementById('sc-widget');
-  widget1         = SC.Widget(widgetIframe);
-  widget1.bind(SC.Widget.Events.FINISH, function() {
-    console.log('done');
-  });
+
+  var formElem = document.getElementById('cool');
+  formElem.onsubmit = function (){
+    var inputElem = document.getElementById('data');
+    var audioElem = document.getElementByTagName('audio');
+    audioElem.src = inputElem.value;
+
+    console.log(inputElem.value);
+  }
 </script>
 </body>
 </html>

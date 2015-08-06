@@ -139,35 +139,69 @@ var updateIcon = function (type){
   currentIcon = type;
 }
 
+var addEvents = function (eventType, eventHandler){
+    var widgetIframe = document.getElementById('sc-widget');
+    widget          = SC.Widget(widgetIframe);
+    widget.bind(eventType, eventHandler);
+}
+
+// var playSoundcloud = function (song){
+//   var widgetIframe = document.getElementById('sc-widget');
+//   var newSoundUrl  = "https://w.soundcloud.com/player/?url=" + song + "&amp;auto_play=true&amp;hide_related=false&amp;show_comments=true&amp;show_user=true&amp;show_reposts=false&amp;visual=true";
+//   var widget1          = SC.Widget(widgetIframe);
+
+//   if(currentIcon === 'pausePlayingSong') {
+//     widget1.play();
+//   } else  {
+//     widgetIframe.src = newSoundUrl;
+//     widget1.bind(SC.Widget.Events.READY, function(){
+//       console.log('ended');
+//     })
+//   }
+//   updateIcon('playingSong');
+//   console.log(song);
+// }
+
+// var stopSoundcloud = function (){
+//   var widgetIframe = document.getElementById('sc-widget');
+//   widgetIframe.src = '';
+//   updateIcon('stopPlayingSong');
+// }
+
+// var pauseSoundcloud = function () {
+//   var widgetIframe = document.getElementById('sc-widget');
+//   widget1          = SC.Widget(widgetIframe);
+//   widget1.pause();
+//   updateIcon('pausePlayingSong');
+// }
+
+
+
 var playSoundcloud = function (song){
-  var widgetIframe = document.getElementById('sc-widget');
-  var newSoundUrl  = "https://w.soundcloud.com/player/?url=" + song + "&amp;auto_play=true&amp;hide_related=false&amp;show_comments=true&amp;show_user=true&amp;show_reposts=false&amp;visual=true";
+  var audioElem = document.getElementById('audioElem');
+  var newSoundUrl  = song + "?client_id=aa3e10d2de1e1304e62f07feb898e745";
+  
   if(currentIcon === 'pausePlayingSong') {
-    widget1          = SC.Widget(widgetIframe);
-    widget1.play();
+    audioElem.play();
   } else  {
-    widgetIframe.src = newSoundUrl;
+    audioElem.src = newSoundUrl;
+    audioElem.onended = function(){
+      updateIcon('endedSong');
+    }
   }
   updateIcon('playingSong');
-  console.log(song);
 }
 
 var stopSoundcloud = function (){
-  var widgetIframe = document.getElementById('sc-widget');
-  widgetIframe.src = '';
+  var audioElem = document.getElementById('audioElem');
+  audioElem.src = '';
   updateIcon('stopPlayingSong');
 }
 
 var pauseSoundcloud = function () {
-  var widgetIframe = document.getElementById('sc-widget');
-  widget1          = SC.Widget(widgetIframe);
-  widget1.pause();
+  var audioElem = document.getElementById('audioElem');
+  audioElem.pause();
   updateIcon('pausePlayingSong');
-}
-
-var resumeSoundcloud = function () {
-  var widgetIframe = document.getElementById('sc-widget');
-  updateIcon('playingSong');
 }
 
 
