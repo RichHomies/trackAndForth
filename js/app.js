@@ -227,6 +227,17 @@ return {
       });
     }
 
+    var makePlaylist = function(songArray){
+      var arrayData = [];
+      for(var i = 0; i < songArray.length; i++){
+        arrayData.push({
+          stream_uri: songArray[i]['songData']['stream_url'],
+          title: songArray[i]['songData']['title']
+        })
+      }
+      return arrayData;
+    }
+
     SC.initialize({
       client_id: 'aa3e10d2de1e1304e62f07feb898e745'
     });
@@ -236,7 +247,7 @@ return {
     $scope.youtubeLinks = $firebaseArray(obj.youTubeRef);
     $scope.soundcloudLinks = $firebaseArray(obj.soundCloudRef);
     $scope.favorites = $firebaseArray(obj.favoriteMusicRef);
-
+    console.log($scope.favorites);
     $scope.messages.$loaded()
     .then(function(data) {
       $scope.messages = data;
@@ -362,8 +373,15 @@ return {
       });
     }
 
-    $scope.playSong = function(song){
-      chrome.extension.getBackgroundPage().playSoundcloud(song);
+    $scope.playSong = function(song, favorites, songFav){
+      var index = _.findIndex(favorites, function(chr) {
+        return chr == songFav;
+      });
+      var playList = makePlaylist(favorites);
+      console.log('index ', index);
+      console.log('playlist ', playList);
+      chrome.extension.getBackgroundPage().makeSongQueue(playList, index);
+      chrome.extension.getBackgroundPage().playSongQueue();
     }
 
     $scope.stopSong = function(){
@@ -373,6 +391,8 @@ return {
     $scope.pauseSong = function(){
       chrome.extension.getBackgroundPage().pauseSoundcloud();
     }    
+
+
 
   }])
 

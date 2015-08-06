@@ -2,6 +2,27 @@ var messagesRef;
 var str;
 var nameString;
 var currentIcon = 'default'; 
+var soundcloudQueue;
+
+var Queue = function() {
+  this._storage = {};
+  this._head = 0;
+  this._tail = 0;
+};
+
+Queue.prototype.add = function(elem) {
+  this._storage[this._tail] = elem;
+  this._tail++;
+};
+
+Queue.prototype.remove = function() {
+  if (this._head === this._tail) return null;
+
+  var elem = this._storage[this._head];
+  delete this._storage[this._head];
+  this._head++;
+  return elem;
+};
 
 var setRef = function(ref){
   messageRef = new Firebase(ref);
@@ -145,48 +166,19 @@ var addEvents = function (eventType, eventHandler){
     widget.bind(eventType, eventHandler);
 }
 
-// var playSoundcloud = function (song){
-//   var widgetIframe = document.getElementById('sc-widget');
-//   var newSoundUrl  = "https://w.soundcloud.com/player/?url=" + song + "&amp;auto_play=true&amp;hide_related=false&amp;show_comments=true&amp;show_user=true&amp;show_reposts=false&amp;visual=true";
-//   var widget1          = SC.Widget(widgetIframe);
-
-//   if(currentIcon === 'pausePlayingSong') {
-//     widget1.play();
-//   } else  {
-//     widgetIframe.src = newSoundUrl;
-//     widget1.bind(SC.Widget.Events.READY, function(){
-//       console.log('ended');
-//     })
-//   }
-//   updateIcon('playingSong');
-//   console.log(song);
-// }
-
-// var stopSoundcloud = function (){
-//   var widgetIframe = document.getElementById('sc-widget');
-//   widgetIframe.src = '';
-//   updateIcon('stopPlayingSong');
-// }
-
-// var pauseSoundcloud = function () {
-//   var widgetIframe = document.getElementById('sc-widget');
-//   widget1          = SC.Widget(widgetIframe);
-//   widget1.pause();
-//   updateIcon('pausePlayingSong');
-// }
-
 
 
 var playSoundcloud = function (song){
   var audioElem = document.getElementById('audioElem');
   var newSoundUrl  = song + "?client_id=aa3e10d2de1e1304e62f07feb898e745";
-  
+
   if(currentIcon === 'pausePlayingSong') {
     audioElem.play();
   } else  {
     audioElem.src = newSoundUrl;
     audioElem.onended = function(){
       updateIcon('endedSong');
+      playSongQueue();
     }
   }
   updateIcon('playingSong');
@@ -203,5 +195,22 @@ var pauseSoundcloud = function () {
   audioElem.pause();
   updateIcon('pausePlayingSong');
 }
+//new
+var makeSongQueue =  function(songs, index){
+  soundcloudQueue = new Queue();
+  for(var i = index; i < songs.length; i++){
+    soundcloudQueue.add(songs[i]);
+  }
+}
+
+var playSongQueue = function (){
+  var song = soundcloudQueue.remove();
+  if(song) {
+    playSoundcloud(song.stream_uri);
+  }
+}
+
+
+
 
 

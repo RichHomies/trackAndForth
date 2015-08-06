@@ -5,6 +5,9 @@
     </button>
   </div>
 
+
+
+
   <div align='middle'><i class='medium material-icons'>forum</i></div>
   <div id='messagesDiv' scroll-glue='!glued'>
     <div ng-repeat='message in messages | orderBy: reverse' emit-last-repeater-element>
@@ -53,6 +56,12 @@
     </button>
   </form>
 
+  <div >
+    <button ng-click='makePlaylist()' class='btn waves-effect waves-light' type='submit' ng-click='logOff()'>Play All
+      <i class='material-icons'></i>
+    </button>
+  </div>
+
   <div ng-if='favorites.length' id='fav'>
     <a ng-click='showfavorites = !showfavorites' class='waves-effect waves-light btn'>
       <!--       <img align='middle' id='diamondTeal'src='../assets/diamond-teal-64.png' ng-model='showfavorites' ng-init='showfavorites = false' >-->
@@ -65,7 +74,7 @@
                 <div class="col s12 m7 ">
                   <div class="card">
                     <div class="card-image">
-                      <img ng-src="{{favorite.songData.artwork_url || trustSrc('../assets/soundcloud.png')}}" ng-click='playSong(favorite.songData.stream_url)'>
+                      <img ng-src="{{favorite.songData.artwork_url || trustSrc('../assets/soundcloud.png')}}" ng-click='playSong(favorite.songData.stream_url, favorites, favorite)'>
                     </div>
                     <div class='card-info'>
                     <div class="card-content">
