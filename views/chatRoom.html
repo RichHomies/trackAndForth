@@ -7,7 +7,6 @@
 
 
 
-
   <div align='middle'><i class='medium material-icons'>forum</i></div>
   <div id='messagesDiv' scroll-glue='!glued'>
     <div ng-repeat='message in messages | orderBy: reverse' emit-last-repeater-element>
@@ -32,7 +31,7 @@
           <span ng-model='showSoundCloud' ng-init='showSoundCloud = false' ng-click='showSoundCloud = !showSoundCloud'> <a href="#">shared a song from soundcloud.</a></span> 
 
           <div ng-if='showSoundCloud' scroll-if="showSoundCloud" id='{{message.text}}' align='middle'>
-            <!-- <iframe width='90%' height='166' scrolling='no' frameborder='no' ng-src='{{scTrustSrc(message.text)}}'></iframe> -->
+
             <a href="#">
               <img src="{{message.songData.artwork_url}}" ng-click='playSong(message.songData.stream_url)'>
               <div>{{message.songData.title}}</div>
@@ -56,15 +55,8 @@
     </button>
   </form>
 
-  <div >
-    <button ng-click='makePlaylist()' class='btn waves-effect waves-light' type='submit' ng-click='logOff()'>Play All
-      <i class='material-icons'></i>
-    </button>
-  </div>
-
   <div ng-if='favorites.length' id='fav'>
     <a ng-click='showfavorites = !showfavorites' class='waves-effect waves-light btn'>
-      <!--       <img align='middle' id='diamondTeal'src='../assets/diamond-teal-64.png' ng-model='showfavorites' ng-init='showfavorites = false' >-->
       <i class="large material-icons" ng-model='showfavorites' ng-init='showfavorites = false'>queue_music</i></a>
       <div >
         <div ng-if='showfavorites' scroll-if='showfavorites' id='favorites'>
@@ -77,15 +69,15 @@
                       <img ng-src="{{favorite.songData.artwork_url || trustSrc('../assets/soundcloud.png')}}" ng-click='playSong(favorite.songData.stream_url, favorites, favorite)'>
                     </div>
                     <div class='card-info'>
-                    <div class="card-content">
-                      <span>{{favorite.songData.title}}</span>
-                    </div>
-                    <div class="card-action">
-                      <a href="#" ng-click='playSong(favorite.songData.stream_url)'><i class="material-icons">play_arrow</i></a>
-                      <a href="#" ng-click='pauseSong()'><i class="material-icons">pause</i></a>
-                      <a href="#" ng-click='stopSong()'><i class="material-icons">stop</i></a>
-                      <img src='../trash.png' class='trash' ng-click='remove(favorite, false, false, true)'>
-                    </div>
+                      <div class="card-content">
+                        <span>{{favorite.songData.title}}</span>
+                      </div>
+                      <div class="card-action">
+                        <a href="#" ng-click='playSong(favorite.songData.stream_url, favorites, favorite)'><i class="material-icons">play_arrow</i></a>
+                        <a href="#" ng-click='pauseSong()'><i class="material-icons">pause</i></a>
+                        <a href="#" ng-click='stopSong()'><i class="material-icons">stop</i></a>
+                        <img src='../trash.png' class='trash' ng-click='remove(favorite, false, false, true)'>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -106,51 +98,9 @@
       </div>
     </div>
 
-<!--   <div id='youTube' ng-if='youtubeLinks.length'>
-    <a ng-click='showyt = !showyt'  ng-model='showyt' class='waves-effect waves-light btn mediaButton'>
-      <img id='ytCard' align='middle' src='../assets/YouTube.png' ng-init='showyt = false' ></a>
-      <div>
-        <div ng-if='showyt' scroll-if='showyt' id='yt'>
-          <div ng-repeat='youtube in youtubeLinks'> <div>Posted by: {{youtube.name}}</div>
-          <iframe width='90%' height='315' ng-src='{{ytTrustSrc(youtube.text)}}'  frameborder='0' allowfullscreen onended='window.ended()'></iframe> 
-          <img src='../trash.png' class='youTrash' ng-click='remove(youtube, true, false)'>
-        </div>
-      </div>
-    </div>
+
+
+
+
   </div>
-
-  <div ng-if='soundcloudLinks.length'>
-    <a ng-click='showsc = !showsc' class='waves-effect waves-light btn mediaButton' >
-      <img align='middle' src='../assets/soundcloud.png' ng-model='showsc' ng-init='showsc = false' ></a>
-      <div >
-        <div ng-if='showsc' scroll-if='showsc' id='sc'>
-          <div ng-repeat='soundcloudlink in soundcloudLinks' id='soundclod' >  <div>Posted by: {{soundcloudlink.name}}</div>
-          <iframe width='80%' height='166' scrolling='no' frameborder='no' ng-src='{{scTrustSrc(soundcloudlink.text)}}'></iframe>
-          <img src='../trash.png' class='soundTrash' ng-click='remove(soundcloudlink, false, true)'>
-        </div>
-      </div>
-    </div>
-  </div> -->
-
-
-
-
-
-<!-- 
-  <a href="#" ng-click='helpView = !helpView' ng-init='helpView = false'>Give feedback/comments/etc...</a>
-  <div align='middle' ng-if='helpView' >
-
-    <div ng-init='showHelp = true'>{{response}}</div>
-
-    <form  ng-submit='submitFeedback()' ng-if='showHelp' scroll-if='showHelp' id='helpForm'>
-
-    <div>
-      <input type='text' id='feedbackTxtArea' ng-model='$parent.feedbackText' ng-submit='submitFeedback()' placeholder='Please provide me with feedback'>
-    </div>
-
-    </form>
-  </div> -->
-
-
-</div>
 
