@@ -38,7 +38,7 @@ var app = angular.module("chatApp", ["firebase", "luegg.directives", 'ui.router'
 
 })
 .run(function(User, $state){
-  chrome.extension.getBackgroundPage().updateIcon('default');
+  chrome.extension.getBackgroundPage().updateIcon('openPopup');
   User.fetchFromLocalStorage(function(localStorageObject){
     var refExists = localStorageObject.firebaseRef;
     refExists = '' + refExists; 
@@ -142,7 +142,9 @@ var initRef = function(){
   ref = new Firebase(str + "/chat");
   userRef = new Firebase(str + '/usersInfo');
   youTubeRef = new Firebase(str + "/youtube");
-  soundCloudRef = new Firebase(str + "/s oundcloud");
+  soundCloudRef = new Firebase(str + "/soundcloud");
+  // chrome.extension.getBackgroundPage().setRef(ref);
+  // chrome.extension.getBackgroundPage().setEvents();
 }
 
 var initAuthDependentRef =  function(){
@@ -199,6 +201,21 @@ return {
   function($scope, $firebaseArray, User, $state, $sce, $http, $anchorScroll, $location) {
     var obj = User.getRef();
     console.log(obj);
+    
+    var updateTitle = function(songTitle){
+      $scope.songTitle = songTitle;
+      $scope.$apply();
+    }
+
+    chrome.storage.sync.get('currentlyPlaying', function(localStorageObject){
+      if(localStorageObject.currentlyPlaying !== undefined){
+        updateTitle(localStorageObject.currentlyPlaying);
+      };
+    });
+
+    chrome.storage.onChanged.addListener(function(changes, namespace) {
+        updateTitle(changes['currentlyPlaying']['newValue']);
+    });
 
     var mapArray = function(arr) {
       var output = [[arr[0]]];
@@ -373,7 +390,7 @@ return {
       });
     }
 
-    $scope.playSong = function(song, favorites, songFav){
+    $scope.playSongs = function(song, favorites, songFav){
       var index = _.findIndex(favorites, function(chr) {
         return chr == songFav;
       });
@@ -383,6 +400,12 @@ return {
       chrome.extension.getBackgroundPage().makeSongQueue(playList, index);
       chrome.extension.getBackgroundPage().playSongQueue();
     }
+
+    $scope.playSong = function(song, title){
+      chrome.extension.getBackgroundPage().playSoundcloud(song);
+      chrome.extension.getBackgroundPage().saveCurrenlyPlayingToSyncStorage(title);
+    }
+
 
     $scope.stopSong = function(){
       chrome.extension.getBackgroundPage().stopSoundcloud();
@@ -500,9 +523,9 @@ return {
       } else  {
           //set error
           $scope.error = 'invalid firebase reference';
+        }
       }
-    }
-}])
+    }])
 .controller("helpCtrl", ["$scope", "$firebaseArray", "$state", "User",
   function($scope, $firebaseArray, $state, User){
     $scope.goBack =  function(){

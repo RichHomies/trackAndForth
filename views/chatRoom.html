@@ -6,8 +6,11 @@
   </div>
 
 
-
   <div align='middle'><i class='medium material-icons'>forum</i></div>
+  <div >
+    Currently Playing: {{songTitle}}
+  </div>
+
   <div id='messagesDiv' scroll-glue='!glued'>
     <div ng-repeat='message in messages | orderBy: reverse' emit-last-repeater-element>
       <!-- <div class='card-panel word' > -->
@@ -33,9 +36,9 @@
           <div ng-if='showSoundCloud' scroll-if="showSoundCloud" id='{{message.text}}' align='middle'>
 
             <a href="#">
-              <img src="{{message.songData.artwork_url}}" ng-click='playSong(message.songData.stream_url)'>
+              <img src="{{message.songData.artwork_url}}" ng-click='playSong(message.songData.stream_url, message.songData.title)'>
               <div>{{message.songData.title}}</div>
-              <a href="#" ng-click='playSong(message.songData.stream_url)'><i class="material-icons">play_arrow</i></a>
+              <a href="#" ng-click='playSong(message.songData.stream_url, message.songData.title)'><i class="material-icons">play_arrow</i></a>
               <a href="#" ng-click='pauseSong()'><i class="material-icons">pause</i></a>
               <a href="#" ng-click='stopSong()'><i class="material-icons">stop</i></a>
             </a>
@@ -73,7 +76,7 @@
                         <span>{{favorite.songData.title}}</span>
                       </div>
                       <div class="card-action">
-                        <a href="#" ng-click='playSong(favorite.songData.stream_url, favorites, favorite)'><i class="material-icons">play_arrow</i></a>
+                        <a href="#" ng-click='playSongs(favorite.songData.stream_url, favorites, favorite)'><i class="material-icons">play_arrow</i></a>
                         <a href="#" ng-click='pauseSong()'><i class="material-icons">pause</i></a>
                         <a href="#" ng-click='stopSong()'><i class="material-icons">stop</i></a>
                         <img src='../trash.png' class='trash' ng-click='remove(favorite, false, false, true)'>

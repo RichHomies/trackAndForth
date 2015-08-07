@@ -3,16 +3,19 @@ var str;
 var nameString;
 var currentIcon = 'default'; 
 var soundcloudQueue;
+var currentSong;
 
 var Queue = function() {
   this._storage = {};
   this._head = 0;
   this._tail = 0;
+  this._count = 0;
 };
 
 Queue.prototype.add = function(elem) {
   this._storage[this._tail] = elem;
   this._tail++;
+  this._count++;
 };
 
 Queue.prototype.remove = function() {
@@ -21,15 +24,16 @@ Queue.prototype.remove = function() {
   var elem = this._storage[this._head];
   delete this._storage[this._head];
   this._head++;
+  this._count--;
   return elem;
 };
 
 var setRef = function(ref){
-  messageRef = new Firebase(ref);
-  setRef();
+  messageRef = ref;
 }
 
 var setEvents = function(){
+  console.log(messageRef);
   messagesRef.limitToLast(25).on("child_added", function (snapshot) {
     var message = snapshot.val();
     var timeStampAtTimeZero = new Date();
@@ -37,7 +41,9 @@ var setEvents = function(){
     var elapsedTime = (timeStampAtTimeZero - timeStampAtNow)/1000;
     var myMessage =  message.name === nameString;
     if(elapsedTime < 60*5 && !myMessage){
-      updateIcon('newMessage');
+      updateIcon('newMessage', function(){
+        console.log('new message icon');
+      });
     }
   });
 };
@@ -135,10 +141,10 @@ var pushToFbaseChat = function(source, id, ts, chatRef){
   }
 };
 
-var updateIcon = function (type){
-  
-  if(currentIcon === 'playingSong' && type === 'default'){
-    return;
+var updateIcon = function (type, cb){
+
+  if(currentIcon === 'playingSong' && type === 'openPopup'){
+    type = 'playingSong';
   }
 
   if(currentIcon === 'playingSong' && type === 'newMessage') {
@@ -155,18 +161,11 @@ var updateIcon = function (type){
     'pausePlayingSong' : 'assets/diamond.png'
   }
 
-  chrome.browserAction.setIcon({path: iconPaths[type]});
-
+  chrome.browserAction.setIcon({path: iconPaths[type]}, function(){
+    cb();
+  });
   currentIcon = type;
 }
-
-var addEvents = function (eventType, eventHandler){
-    var widgetIframe = document.getElementById('sc-widget');
-    widget          = SC.Widget(widgetIframe);
-    widget.bind(eventType, eventHandler);
-}
-
-
 
 var playSoundcloud = function (song){
   var audioElem = document.getElementById('audioElem');
@@ -177,25 +176,45 @@ var playSoundcloud = function (song){
   } else  {
     audioElem.src = newSoundUrl;
     audioElem.onended = function(){
-      updateIcon('endedSong');
-      playSongQueue();
+      
+      console.log('ended');
+      var dateStamp = new Date();
+      console.log('time ', dateStamp);
+      
+      updateIcon('endedSong', function(){
+        console.log('update icon ended');
+        saveCurrenlyPlayingToSyncStorage('', function(){
+          playSongQueue();
+        });
+        
+      });
+
     }
   }
-  updateIcon('playingSong');
+
+  updateIcon('playingSong', function(){
+    console.log('updated icon playing');
+  });
 }
 
 var stopSoundcloud = function (){
   var audioElem = document.getElementById('audioElem');
   audioElem.src = '';
-  updateIcon('stopPlayingSong');
+  saveCurrenlyPlayingToSyncStorage('', function(){
+    updateIcon('stopPlayingSong', function(){
+      console.log('updated icon stop');
+    });
+  });
 }
 
 var pauseSoundcloud = function () {
   var audioElem = document.getElementById('audioElem');
   audioElem.pause();
-  updateIcon('pausePlayingSong');
+  updateIcon('pausePlayingSong', function(){
+    console.log('updated icon pause');
+  });
 }
-//new
+
 var makeSongQueue =  function(songs, index){
   soundcloudQueue = new Queue();
   for(var i = index; i < songs.length; i++){
@@ -204,13 +223,29 @@ var makeSongQueue =  function(songs, index){
 }
 
 var playSongQueue = function (){
-  var song = soundcloudQueue.remove();
-  if(song) {
+  console.log('soundcloudQueue ', soundcloudQueue);
+  console.log('count ', soundcloudQueue._count);
+  var song;
+  if(soundcloudQueue._count){
+    song = soundcloudQueue.remove();
     playSoundcloud(song.stream_uri);
+    saveCurrenlyPlayingToSyncStorage(song.title, function(){
+      console.log('saved song title to storage');
+    });
   }
 }
 
+var saveCurrenlyPlayingToSyncStorage = function (song, cb){
+    chrome.storage.sync.set({currentlyPlaying: song}, function(){
+      var dateStamp = new Date();
+      console.log('time ', dateStamp);
+      console.log('saved To local storage');
+      cb();
+    });
+}
 
-
+saveCurrenlyPlayingToSyncStorage('', function(){
+  console.log('set song name to empty string');
+});
 
 
