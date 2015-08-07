@@ -403,7 +403,9 @@ return {
 
     $scope.playSong = function(song, title){
       chrome.extension.getBackgroundPage().playSoundcloud(song);
-      chrome.extension.getBackgroundPage().saveCurrenlyPlayingToSyncStorage(title);
+      chrome.extension.getBackgroundPage().saveCurrenlyPlayingToSyncStorage(title, function(){
+        console.log('saved song name ', title);
+      });
     }
 
 
