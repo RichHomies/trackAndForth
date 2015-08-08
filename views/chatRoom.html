@@ -59,10 +59,10 @@
   </div>
 
 
-  <div align='middle'><i class='medium material-icons'>forum</i></div>
-  <div >
-    Currently Playing: {{songTitle}}
+  <div align='middle' >
+    <i  class='medium material-icons'>forum</i>
   </div>
+
 
   <div id='messagesDiv' scroll-glue='!glued'>
     <div ng-repeat='message in messages | orderBy: reverse' emit-last-repeater-element>
@@ -110,6 +110,10 @@
       <i class='material-icons'>send</i>
     </button>
   </form>
+
+    <div>
+      <img src="./assets/playing.png"> <div>{{songTitle}}</div>
+    </div>
 
   <div ng-if='favorites.length' id='fav'>
     <a ng-click='showfavorites = !showfavorites' class='waves-effect waves-light btn'>

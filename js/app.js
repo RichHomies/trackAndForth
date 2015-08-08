@@ -203,6 +203,7 @@ return {
     console.log(obj);
     
     var updateTitle = function(songTitle){
+      $scope.songPlaying = true;
       $scope.songTitle = songTitle;
       $scope.$apply();
     }
