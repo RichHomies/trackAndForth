@@ -196,9 +196,9 @@ return {
 
 })
 
-.controller("ChatCtrl", ["$scope", "$firebaseArray", "User", "$state", "$sce", "$http", "$anchorScroll", "$location",
+.controller("ChatCtrl", ["$scope","$firebaseArray", "User", "$state", "$sce", "$http", "$anchorScroll", "$location", "$timeout",
   // we pass our new chatMessages factory into the controller
-  function($scope, $firebaseArray, User, $state, $sce, $http, $anchorScroll, $location) {
+  function($scope, $firebaseArray, User, $state, $sce, $http, $anchorScroll, $location, $timeout) {
     var obj = User.getRef();
     console.log(obj);
     
@@ -270,7 +270,9 @@ return {
     $scope.messages.$loaded()
     .then(function(data) {
       $scope.messages = data;
-      $scope.loadingComplete = true;
+      $timeout(function(){
+        $scope.loadingComplete = true;
+      }, 100);
     })
     .catch(function(error) {
       console.log("Error:", error);
