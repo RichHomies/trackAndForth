@@ -64,145 +64,140 @@ input {
   margin: 1px auto;
 }
 
-/*form {
+em {
+  font-style: normal;
+  font-weight: bold;
+  color: black;
+}
+
+/* Chat */
+#messagesDiv {
+  background-color: white;
+  overflow: auto;
+  height: 460px;
+  width: 100%;
+  padding: 10px;
+  padding-left: 0px;
+  padding-right: 0px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  text-align: left;
+  display:block;
+}
+#youTube, #soundcloud {
+  padding-bottom: 25px;
+  border-bottom-width: 25px;
+  border-top-width: 25px;
+  padding-top: 25px;
+}
+
+#nameView, #registerView, #messageView, #signInView {
+  display: visible;
+  padding-bottom: 10px;
+  padding-top: 10px;
+  padding-right: 10px;
+  padding-left: 10px;
+}
+
+#nameInput {
+  width: 26%;
+}
+
+.word {
+  word-wrap: break-word;
+}
+
+.text {
+  width: 70%; 
+  float:right;
+}
+
+#feedbackTxtArea {
+  width: 80%;
+  height: 6rem;
+}
+
+#feedbackBtn {
+  vertical-align: top;
+}
+#messageInput {
+  width: 76%;
+}
+
+.messageDiv {
+  background-color: whitesmoke;
+}
+
+img.youTrash {
+  padding-bottom: 300px;
+}
+
+img.soundTrash {
+  padding-bottom: 150px;
+}
+
+#logout{
+  padding-bottom: 25px;
+  position : absolute;
+  top : 12px;
+  right : 12px;
+  font-size: 12px;
+}
+
+#messageSubmitBtn {
+  right: 12px;
+  float: right;
+}
+
+.card-panel {
+  margin-bottom: 0px;
+  margin-top: 0px;
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+
+#main {
+  background-color: white;
+}
+
+.mediaButton {
+  height: 100%;
+  margin-bottom: 12px;
+}
+
+#ytCard {
   margin-bottom: 10px;
   margin-top: 10px;
-  }*/
+  margin-right: 6px;
+  margin-left: 6px;
+}
+iframe {
+  padding-left: 16px;
+}
 
-  em {
-    font-style: normal;
-    font-weight: bold;
-    color: black;
-  }
+.scCard {
+  width: 95%;
+  margin-left: 12px;
+  margin-top: 12px;
+}
 
-  /* Chat */
-  #messagesDiv {
-    background-color: white;
-    overflow: auto;
-    height: 460px;
-    width: 100%;
-    padding: 10px;
-    padding-left: 0px;
-    padding-right: 0px;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    text-align: left;
-    display:block;
-  }
-  #youTube, #soundcloud {
-    padding-bottom: 25px;
-    border-bottom-width: 25px;
-    border-top-width: 25px;
-    padding-top: 25px;
-  }
+.trash {
+  padding-bottom: 5px;
+  padding-left: 5px;
+}
 
-  #nameView, #registerView, #messageView, #signInView {
-    display: visible;
-    padding-bottom: 10px;
-    padding-top: 10px;
-    padding-right: 10px;
-    padding-left: 10px;
-  }
+.imgCard {
+  display: inline;
+  width: 30%;
+}
 
-  #nameInput {
-    width: 26%;
-  }
-
-  .word {
-    word-wrap: break-word;
-  }
-
-  .text {
-    width: 70%; 
-    float:right;
-  }
-
-  #feedbackTxtArea {
-    width: 80%;
-    height: 6rem;
-  }
-
-  #feedbackBtn {
-    vertical-align: top;
-  }
-  #messageInput {
-    width: 76%;
-  }
-
-  .messageDiv {
-    background-color: whitesmoke;
-  }
-
-  img.youTrash {
-    padding-bottom: 300px;
-  }
-
-  img.soundTrash {
-    padding-bottom: 150px;
-  }
-
-  #logout{
-    padding-bottom: 25px;
-    position : absolute;
-    top : 12px;
-    right : 12px;
-    font-size: 12px;
-  }
-
-  #messageSubmitBtn {
-    right: 12px;
-    float: right;
-  }
-
-  .card-panel {
-    margin-bottom: 0px;
-    margin-top: 0px;
-    padding-top: 0px;
-    padding-bottom: 0px;
-  }
-  
-  #main {
-    background-color: white;
-  }
-
-  .mediaButton {
-    height: 100%;
-    margin-bottom: 12px;
-  }
-
-  #ytCard {
-    margin-bottom: 10px;
-    margin-top: 10px;
-    margin-right: 6px;
-    margin-left: 6px;
-  }
-  iframe {
-    padding-left: 16px;
-  }
-
-  .scCard {
-    width: 95%;
-    margin-left: 12px;
-    margin-top: 12px;
-  }
-
-  .trash {
-    padding-bottom: 5px;
-    padding-left: 5px;
-  }
-
-  .imgCard {
-    display: inline;
-    width: 30%;
-  }
-
-  .soundCard {
-    width: 50%;
-  }
-  .songInfo {
-    display: inline;
-    width: 60%;
-  }
+.soundCard {
+  width: 50%;
+}
+.songInfo {
+  display: inline;
+  width: 60%;
+}
 
 
 .card-image{ 
@@ -223,23 +218,23 @@ input {
 
 
 
-  @font-face {
-    font-family: 'Material Icons';
-    font-style: normal;
-    font-weight: 400;
-    src: local('Material Icons'), local('MaterialIcons-Regular'), url(https://fonts.gstatic.com/s/materialicons/v7/2fcrYFNaTjcS6g4U3t-Y5UEw0lE80llgEseQY3FEmqw.woff2) format('woff2');
-  }
+@font-face {
+  font-family: 'Material Icons';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Material Icons'), local('MaterialIcons-Regular'), url(https://fonts.gstatic.com/s/materialicons/v7/2fcrYFNaTjcS6g4U3t-Y5UEw0lE80llgEseQY3FEmqw.woff2) format('woff2');
+}
 
-  .material-icons {
-    font-family: 'Material Icons';
-    font-weight: normal;
-    font-style: normal;
-    font-size: 24px;
-    line-height: 1;
-    letter-spacing: normal;
-    text-transform: none;
-    display: inline-block;
-    word-wrap: normal;
-    -webkit-font-feature-settings: 'liga';
-    -webkit-font-smoothing: antialiased;
-  }
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  word-wrap: normal;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}

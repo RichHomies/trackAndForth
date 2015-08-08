@@ -214,7 +214,9 @@ return {
     });
 
     chrome.storage.onChanged.addListener(function(changes, namespace) {
-        updateTitle(changes['currentlyPlaying']['newValue']);
+        if(changes['currentlyPlaying']){
+          updateTitle(changes['currentlyPlaying']['newValue']);
+        }
     });
 
     var mapArray = function(arr) {
@@ -264,14 +266,25 @@ return {
     $scope.youtubeLinks = $firebaseArray(obj.youTubeRef);
     $scope.soundcloudLinks = $firebaseArray(obj.soundCloudRef);
     $scope.favorites = $firebaseArray(obj.favoriteMusicRef);
-    console.log($scope.favorites);
+
     $scope.messages.$loaded()
     .then(function(data) {
       $scope.messages = data;
+      $scope.loadingComplete = true;
     })
     .catch(function(error) {
       console.log("Error:", error);
     });
+
+    // chrome.storage.sync.get('messages', function(localStorageObject){
+    //   $scope.messages = localStorageObject.messages;
+    // });
+
+    // chrome.storage.onChanged.addListener(function(changes, namespace) {
+    //     if(changes['messages']){
+    //       $scope.messages = changes['messages']['newValue'];
+    //     }
+    // });
 
     $scope.$on('LastRepeaterElement', function(){
     });

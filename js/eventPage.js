@@ -1,4 +1,5 @@
 var messagesRef;
+var messages;
 var str;
 var nameString;
 var currentIcon = 'default'; 
@@ -34,7 +35,7 @@ var setRef = function(ref){
 
 var setEvents = function(){
   console.log(messageRef);
-  messagesRef.limitToLast(25).on("child_added", function (snapshot) {
+  messagesRef.on("child_added", function (snapshot) {
     var message = snapshot.val();
     var timeStampAtTimeZero = new Date();
     var timeStampAtNow = new Date(message.timeStamp);
@@ -46,6 +47,17 @@ var setEvents = function(){
       });
     }
   });
+
+  messages = $firebaseArray(messages);
+  messages.$loaded()
+    .then(function(data) {
+      chrome.storage.sync.set({messages: data}, function(){
+        console.log('saved messages');
+      });
+    })
+    .catch(function(error) {
+      console.log("Error:", error);
+    });
 };
 
 var onClickHandler = function(info, tab) {
@@ -248,4 +260,15 @@ saveCurrenlyPlayingToSyncStorage('', function(){
   console.log('set song name to empty string');
 });
 
+
+chrome.storage.onChanged.addListener(function(changes, namespace) {
+
+    if(changes['firebaseRef']) {
+      console.log(changes['firebaseRef']['newValue']);
+      var newFBRef = new Firebase(changes['firebaseRef']['newValue'] +'chat');
+      setRef(newFBRef);
+      setEvents();
+    }
+    
+});
 
