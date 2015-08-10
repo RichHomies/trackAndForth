@@ -33,6 +33,29 @@ input {
   font-size: 24px;
 }
 
+#fav {
+  padding-bottom: 12px;
+}
+
+#queueIcon {
+  background-color: #26a69a;
+}
+
+
+/* The starting CSS styles for the enter animation */
+.fade.ng-enter {
+  transition:0.5s linear all;
+  opacity:0;
+}
+
+/* The finishing CSS styles for the enter animation */
+.fade.ng-enter.ng-enter-active {
+  opacity:1;
+}
+
+.mediaButton {
+  background-color: white;
+}
 .input {
   color: #424547;
   border: 1px solid #c2c2c2;
@@ -41,10 +64,10 @@ input {
   margin: 1px auto;
 }
 
-/*form {
-  margin-bottom: 10px;
-  margin-top: 10px;
-}*/
+#progressLoader {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
 
 em {
   font-style: normal;
@@ -56,10 +79,13 @@ em {
 #messagesDiv {
   background-color: white;
   overflow: auto;
-  height: 230px;
+  height: 360px;
   width: 100%;
   padding: 10px;
-  margin-bottom: 5px;
+  padding-left: 0px;
+  padding-right: 0px;
+  padding-top: 10px;
+  padding-bottom: 10px;
   text-align: left;
   display:block;
 }
@@ -82,13 +108,29 @@ em {
   width: 26%;
 }
 
-#messageInput {
-  width: 95%;
+.word {
+  word-wrap: break-word;
 }
 
-.rightdiv {
-  float: right;
-  width: 250px;
+.text {
+  width: 70%; 
+  float:right;
+}
+
+#feedbackTxtArea {
+  width: 80%;
+  height: 6rem;
+}
+
+#feedbackBtn {
+  vertical-align: top;
+}
+#messageInput {
+  width: 76%;
+}
+
+.messageDiv {
+  background-color: whitesmoke;
 }
 
 img.youTrash {
@@ -101,10 +143,86 @@ img.soundTrash {
 
 #logout{
   padding-bottom: 25px;
+  position : absolute;
+  top : 12px;
+  right : 12px;
+  font-size: 12px;
+}
+
+#messageSubmitBtn {
+  right: 12px;
+  float: right;
+}
+
+.card-panel {
+  margin-bottom: 0px;
+  margin-top: 0px;
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+
+#main {
+  background-color: white;
+}
+
+.mediaButton {
+  height: 100%;
+  margin-bottom: 12px;
+}
+
+#ytCard {
+  margin-bottom: 10px;
+  margin-top: 10px;
+  margin-right: 6px;
+  margin-left: 6px;
 }
 
 iframe {
   padding-left: 16px;
+}
+
+.card iframe {
+  margin-top: 12px;
+}
+
+.scCard {
+  width: 95%;
+  margin-left: 12px;
+  margin-top: 12px;
+}
+
+.trash {
+  padding-bottom: 5px;
+  padding-left: 5px;
+}
+
+.imgCard {
+  display: inline;
+  width: 30%;
+}
+
+.soundCard {
+  width: 50%;
+}
+.songInfo {
+  display: inline;
+  width: 60%;
+}
+
+
+.card-image{ 
+  display:inline-block; 
+  width: 49%; 
+  vertical-align:middle;
+  border-box: box-sizing; 
+}
+
+
+.card-info{
+  display:inline-block; 
+  width: 49%; 
+  vertical-align:middle;
+  border-box: box-sizing; 
 }
 
 @font-face {

@@ -3,7 +3,7 @@
   "name": "Chat with friends",
   "description": "Chat",
   "version": "1.0",
-  "content_security_policy": "script-src 'self' https://cdn.firebase.com https://*.firebaseio.com; object-src 'self'", 
+  "content_security_policy": "script-src 'self' https://cdn.firebase.com https://*.firebaseio.com https://api.soundcloud.com; object-src 'self'", 
   "browser_action": {
     "default_icon": "assets/diamond.png",
     "default_popup": "index.html",

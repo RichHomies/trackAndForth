@@ -1,41 +1,160 @@
-<div ng-controller="ChatCtrl">
-  <span id="header" >{{name}}</span>
-  <div id="messagesDiv" width="100%" scroll-glue="!glued">
-    <div display="block" ng-repeat="message in messages | orderBy: reverse" emit-last-repeater-element>
-      <div>
-        <span ng-if="message.name !== name"><strong>{{message.name}} : </strong></span>
-        <span ng-if="message.name === name"><strong> Me : </strong></span>
-        {{message.text}}</div>
+<div id='main' ng-controller='ChatCtrl' ng-init='obj["loadingComplete"] = false'>
+  <div ng-if='!obj.loadingComplete' id='progressLoader'>
+    <div class="preloader-wrapper big active">
+      <div class="spinner-layer spinner-blue">
+        <div class="circle-clipper left">
+          <div class="circle"></div>
+        </div>
+        <div class="gap-patch">
+          <div class="circle"></div>
+        </div>
+        <div class="circle-clipper right">
+          <div class="circle"></div>
+        </div>
       </div>
-    </div>
-    <form ng-submit="addMessage()">
-      <input type="text" id="messageInput" placeholder="Message..." ng-submit="addMessage()" ng-model="messageText"/>
-    </form>
-    <br>
-    <div id="logout">
-      <button class="btn waves-effect waves-light" type="submit" ng-click="logOff()">log off
-        <i class="material-icons"></i>
+
+      <div class="spinner-layer spinner-red">
+        <div class="circle-clipper left">
+          <div class="circle"></div>
+        </div>
+        <div class="gap-patch">
+          <div class="circle"></div>
+        </div>
+        <div class="circle-clipper right">
+          <div class="circle"></div>
+        </div>
+      </div>
+
+      <div class="spinner-layer spinner-yellow">
+        <div class="circle-clipper left">
+          <div class="circle"></div>
+        </div>
+        <div class="gap-patch">
+          <div class="circle"></div>
+        </div>
+        <div class="circle-clipper right">
+          <div class="circle"></div>
+        </div>
+      </div>
+
+      <div class="spinner-layer spinner-green">
+        <div class="circle-clipper left">
+          <div class="circle"></div>
+        </div>
+        <div class="gap-patch">
+          <div class="circle"></div>
+        </div>
+        <div class="circle-clipper right">
+          <div class="circle"></div>
+        </div>
+      </div>
+    </div>        
+  </div>
+  <div ng-if='obj.loadingComplete'>
+
+    <div id='logout'>
+      <button class='btn waves-effect waves-light' type='submit' ng-click='logOff()'>log off
+        <i class='material-icons'></i>
       </button>
     </div>
-    <div id="youTube" ng-if="youtubeLinks.length">
-      <hr>
-      Youtube
-      <div ng-repeat="youtube in youtubeLinks"> <div>{{youtube.name}}</div>
-      <iframe width="90%" height="315" ng-src="{{ytTrustSrc(youtube.text)}}"  frameborder="0" allowfullscreen onended="window.ended()"></iframe> 
-      <img src="../trash.png" class="youTrash" ng-click="remove(youtube, true, false)">
+
+
+    <div align='middle' >
+      <i  class='medium material-icons'>forum</i>
     </div>
-  </div>
 
-  <div ng-if="soundcloudLinks.length">
-    <hr>
-    Soundcloud
-    <div ng-repeat="soundcloudlink in soundcloudLinks" id="soundclod">
-      <iframe width="80%" height="166" scrolling="no" frameborder="no" ng-src="{{scTrustSrc(soundcloudlink.text)}}"></iframe>
-      <img src="../trash.png" class="soundTrash" ng-click="remove(soundcloudlink, false, true)">
+
+    <div id='messagesDiv' scroll-glue='!glued'>
+      <div ng-repeat='message in messages | orderBy: reverse' emit-last-repeater-element>
+        <!-- <div class='card-panel word' > -->
+
+        <div class='card-panel word' ng-click='show = !show'>
+          <!-- displays the user name -->
+          <strong>{{message.name}} </strong>| {{formatTime(message.timeStamp)}} |
+
+          <!-- if the message is text display the user's chat message-->
+          <span ng-if='!message.musicSource'>{{message.text}}</span>
+          <!-- else, if the message is from youtube, show the youtube player in chat -->
+          <span ng-if='message.musicSource === "yt"'>
+            <span ng-model='showVideo' ng-init='showVideo = false' ng-click='showVideo = !showVideo; scroll(message.text)'> <a href="">shared a song from youtube.</a></span>   
+            <div ng-if='showVideo'  scroll-if="showVideo" id='{{message.text}}'>
+              <iframe  width='90%' height='315' ng-src='{{ytTrustSrc(message.text)}}' frameborder='0' allowfullscreen onended='window.ended()'></iframe> 
+              <a href="" ng-click='addToFavorites(message.text, message.musicSource, null)'><i class="material-icons">queue_music</i></a>
+            </div>
+          </span>
+          <!-- else, if the message is from soundcloud, show the soundcloud player in chat -->
+          <span ng-if='message.musicSource === "sc"'>
+            <span ng-model='showSoundCloud' ng-init='showSoundCloud = false' ng-click='showSoundCloud = !showSoundCloud'> <a href="">shared a song from soundcloud.</a></span> 
+
+            <div ng-if='showSoundCloud' scroll-if="showSoundCloud" id='{{message.text}}' align='middle'>
+
+              <a href="">
+                <img src="{{message.songData.artwork_url}}" ng-click='playSong(message.songData.stream_url, message.songData.title)'>
+                <div>{{message.songData.title}}</div>
+                <a href="" ng-click='playSong(message.songData.stream_url, message.songData.title)'><i class="material-icons">play_arrow</i></a>
+                <a href="" dontScroll='true' ng-click='pauseSong()'><i class="material-icons">pause</i></a>
+                <a href="" ng-click='stopSong()'><i class="material-icons">stop</i></a>
+              </a>
+              <a href="" ng-click='addToFavorites(message.text, message.musicSource, message.songData)'><i class="material-icons">queue_music</i></a>
+            </div>
+          </span>
+        </div>
+      </div>
     </div>
+
+    <form ng-submit='addMessage()' align='middle'>
+      <input type='text' id='messageInput' placeholder='Chat here' ng-submit='addMessage()' ng-model='obj.messageText'/>
+      <button class='btn waves-effect waves-light' id='messageSubmitBtn' type='submit' name='action'>
+        <i class='material-icons'>send</i>
+      </button>
+    </form>
+
+    <div>
+      <img src="./assets/playing.png"> <div>{{songTitle}}</div>
+    </div>
+
+    <div ng-if='favorites.length' id='fav'>
+      <a ng-click='showfavorites = !showfavorites' class='waves-effect waves-light btn'>
+        <i class="large material-icons" ng-model='showfavorites' ng-init='showfavorites = false'>queue_music</i></a>
+        <div >
+          <div ng-if='showfavorites' scroll-if='showfavorites' id='favorites'>
+            <div ng-repeat='favorite in favorites | orderBy: reverse' id='favorites' >
+              <div ng-if='favorite.source === "sc"' >
+                <div class="row">
+                  <div class="col s12 m7 ">
+                    <div class="card">
+                      <div class="card-image">
+                        <img ng-src="{{favorite.songData.artwork_url || trustSrc('../assets/soundcloud.png')}}" ng-click='playSongs(favorite.songData.stream_url, favorites, favorite)'>
+                      </div>
+                      <div class='card-info'>
+                        <div class="card-content">
+                          <span>{{favorite.songData.title}}</span>
+                        </div>
+                        <div class="card-action">
+                          <a href="" ng-click='playSongs(favorite.songData.stream_url, favorites, favorite)'><i class="material-icons">play_arrow</i></a>
+                          <a href="" ng-click='pauseSong()'><i class="material-icons">pause</i></a>
+                          <a href="" ng-click='stopSong()'><i class="material-icons">stop</i></a>
+                          <img src='../trash.png' class='trash' ng-click='remove(favorite, false, false, true)'>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div> 
+              </div>
+
+              <div ng-if='favorite.source === "yt"'>
+                <div class='card ytCard'>
+                <iframe width='90%' height='315' ng-src='{{ytTrustSrc(favorite.song)}}' frameborder='0' allowfullscreen onended='window.ended()'></iframe> 
+
+                <img src='../trash.png' class='youTrash' ng-click='remove(favorite, false, false, true)'>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
-
-</div>
-
 
 

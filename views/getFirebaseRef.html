@@ -1,0 +1,7 @@
+
+  <form ng-submit='saveToLocalStorage()'>
+    <span>Please provide your firebase reference</span>
+    <div align='middle' ng-if='error'> <strong style='color:red;'>{{error}}</strong></div>
+    <input id='firebaseInput' ng-model='stringRef' id='stringRef'/>
+  </form>
+  <a ng-click='help()' href=''>help!</a>
