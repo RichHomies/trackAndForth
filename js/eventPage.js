@@ -30,12 +30,12 @@ Queue.prototype.remove = function() {
 };
 
 var setRef = function(ref){
-  messageRef = ref;
+  messagesRef = ref;
 }
 
 var setEvents = function(){
-  console.log(messageRef);
-  messagesRef.on("child_added", function (snapshot) {
+  console.log(messagesRef);
+  messagesRef.limitToLast(25).on("child_added", function (snapshot) {
     var message = snapshot.val();
     var timeStampAtTimeZero = new Date();
     var timeStampAtNow = new Date(message.timeStamp);
@@ -47,17 +47,6 @@ var setEvents = function(){
       });
     }
   });
-
-  messages = $firebaseArray(messages);
-  messages.$loaded()
-    .then(function(data) {
-      chrome.storage.sync.set({messages: data}, function(){
-        console.log('saved messages');
-      });
-    })
-    .catch(function(error) {
-      console.log("Error:", error);
-    });
 };
 
 var onClickHandler = function(info, tab) {
@@ -163,6 +152,10 @@ var updateIcon = function (type, cb){
     currentIcon = 'playingSongNewMessage';
   }
 
+  if(currentIcon === 'playingSong' && type === 'openPopup') {
+    type = 'playingSong';
+  }
+
   var iconPaths = {
     'playingSong' : 'assets/audio.png',
     'newMessage' : 'assets/diamond_red.png',
@@ -170,7 +163,8 @@ var updateIcon = function (type, cb){
     'playingSongNewMessage' : 'assets/audio_red.png',
     'stopPlayingSong' : 'assets/diamond.png',
     'endedSong' : 'assets/diamond.png',
-    'pausePlayingSong' : 'assets/diamond.png'
+    'pausePlayingSong' : 'assets/diamond.png',
+    'openPopup' : 'assets/diamond'
   }
 
   chrome.browserAction.setIcon({path: iconPaths[type]}, function(){
@@ -262,7 +256,6 @@ saveCurrenlyPlayingToSyncStorage('', function(){
 
 
 chrome.storage.onChanged.addListener(function(changes, namespace) {
-
     if(changes['firebaseRef']) {
       console.log(changes['firebaseRef']['newValue']);
       var newFBRef = new Firebase(changes['firebaseRef']['newValue'] +'chat');

@@ -20,6 +20,16 @@
     "angularfire": "~1.1.1",
     "angular-scroll-glue": "~2.0.5",
     "angular-ui-router": "~0.2.15",
-    "lodash": "~3.10.1"
+    "lodash": "~3.10.1",
+    "chai": "~3.2.0",
+    "mocha": "~2.2.5",
+    "karma": "~0.4.6",
+    "karma-jasmine": "~0.3.6",
+    "karma-chrome-launcher": "~0.2.0",
+    "angular-mocks": "~1.4.3",
+    "expect.js": "~0.3.1"
+  },
+  "devDependencies": {
+    "karma-jasmine": "~0.3.6"
   }
 }

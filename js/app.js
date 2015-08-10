@@ -39,6 +39,7 @@ var app = angular.module("chatApp", ["firebase", "luegg.directives", 'ui.router'
 })
 .run(function(User, $state){
   chrome.extension.getBackgroundPage().updateIcon('openPopup');
+  
   User.fetchFromLocalStorage(function(localStorageObject){
     var refExists = localStorageObject.firebaseRef;
     refExists = '' + refExists; 
@@ -59,7 +60,11 @@ var app = angular.module("chatApp", ["firebase", "luegg.directives", 'ui.router'
           console.log('run check user is not logged in');
           $state.go('signIn');
         }
+      } else {
+        console.log('invalid firebase reference string, need to set a new reference string');
+        $state.go('firebase');       
       }
+
     } else {
       console.log('run check, fb ref does not exist');
       $state.go('firebase');
@@ -143,8 +148,6 @@ var initRef = function(){
   userRef = new Firebase(str + '/usersInfo');
   youTubeRef = new Firebase(str + "/youtube");
   soundCloudRef = new Firebase(str + "/soundcloud");
-  // chrome.extension.getBackgroundPage().setRef(ref);
-  // chrome.extension.getBackgroundPage().setEvents();
 }
 
 var initAuthDependentRef =  function(){
@@ -194,17 +197,52 @@ return {
   initAuthDependentRef : initAuthDependentRef
 };
 
-})
+}).
+factory('localStorage', function(){
 
+  var saveToLocalStorage = function (obj, cb) {
+    chrome.storage.sync.set(obj, function(){
+      console.log('saved to Localstorage. Object: ',obj);
+      cb();
+    });
+  }
+
+  var fetchFromLocalStorage = function (property, cb) {
+    chrome.storage.sync.get(property, function(localStorageObject){
+      if(localStorageObject.property !== undefined){
+        cb(localStorageObject.property);
+      } else {
+        console.log(property, ' key not found in local storage');
+      }
+    });
+  }
+
+  var onChangeInLocalStorage =  function (property, cb){
+    chrome.storage.onChanged.addListener(function(changes, namespace) {
+      if(changes[property]){
+        cb(changes['property']['newValue']);
+      }
+    });
+  }
+
+  return {
+    saveToLocalStorage : saveToLocalStorage,
+    fetchFromLocalStorage : fetchFromLocalStorage,
+    onChangeInLocalStorage : onChangeInLocalStorage
+  };
+
+})
 .controller("ChatCtrl", ["$scope","$firebaseArray", "User", "$state", "$sce", "$http", "$anchorScroll", "$location", "$timeout",
   // we pass our new chatMessages factory into the controller
   function($scope, $firebaseArray, User, $state, $sce, $http, $anchorScroll, $location, $timeout) {
     var obj = User.getRef();
     console.log(obj);
-    
+
     var updateTitle = function(songTitle){
       $scope.songPlaying = true;
       $scope.songTitle = songTitle;
+      songTitle = songTitle ? 'Currently Playing: ' + songTitle : 'chattin n shit';
+      chrome.browserAction.setTitle({title:songTitle});
       $scope.$apply();
     }
 
@@ -215,227 +253,247 @@ return {
     });
 
     chrome.storage.onChanged.addListener(function(changes, namespace) {
-        if(changes['currentlyPlaying']){
-          updateTitle(changes['currentlyPlaying']['newValue']);
-        }
+      if(changes['currentlyPlaying']){
+        updateTitle(changes['currentlyPlaying']['newValue']);
+      }
     });
 
-    var mapArray = function(arr) {
-      var output = [[arr[0]]];
-      var outerIndex = 0;
-      var current = output[0].name;
-      for(var i = 0; i < arr.length; i++){
-        if(current === arr[i].name){
-          output[outerIndex].push(arr[i]);
+    chrome.storage.onChanged.addListener(function(changes, namespace) {
+      if(changes['firebaseRef']){
+        //validate ref
+        //update the app
+        var firebaseIdentifier = changes['firebaseRef'].newValue.split('.');
+        firebaseIdentifier = firebaseIdentifier[1];
+        if(firebaseIdentifier === 'firebaseio'){
+          User.setStr(changes['firebaseRef']);
+          User.initRef();
+          console.log('run check ref exists');
+          var userIsLoggedIn = User.isAuth();
+          if(userIsLoggedIn){
+            User.setAuthObj(userIsLoggedIn);
+            User.initAuthDependentRef();
+            console.log('run check user is logged in');
+            $state.go('messages');
+          } else {
+            console.log('run check user is not logged in');
+            $state.go('signIn');
+          }
         } else {
-          current = arr[i].name;
-          outerIndex++;
-          output.push([arr[i]]);
-          console.log('mapArray console log output ', output);
+          console.log('invalid firebase reference string, need to set a new reference string');
+          $state.go('firebase');       
         }
       }
-      return output;
-    }
-
-    var getInfo = function(track_url, cb){
-      console.log(track_url);
-      var url = "https://api.soundcloud.com/resolve?url=" + track_url + "&client_id=aa3e10d2de1e1304e62f07feb898e745&format=json&_status_code_map[302]=200";
-      $.getJSON(url, function(data) {
-        $.getJSON(data.location, function(response){
-          console.log(response);
-        });
-      });
-    }
-
-    var makePlaylist = function(songArray){
-      var arrayData = [];
-      for(var i = 0; i < songArray.length; i++){
-        arrayData.push({
-          stream_uri: songArray[i]['songData']['stream_url'],
-          title: songArray[i]['songData']['title']
-        })
-      }
-      return arrayData;
-    }
-
-    SC.initialize({
-      client_id: 'aa3e10d2de1e1304e62f07feb898e745'
     });
 
-    $scope.name;
-    $scope.messages = $firebaseArray(obj.ref);
-    $scope.youtubeLinks = $firebaseArray(obj.youTubeRef);
-    $scope.soundcloudLinks = $firebaseArray(obj.soundCloudRef);
-    $scope.favorites = $firebaseArray(obj.favoriteMusicRef);
 
-    $scope.messages.$loaded()
-    .then(function(data) {
-      $scope.messages = data;
-      $timeout(function(){
-        $scope.loadingComplete = true;
-      }, 100);
+
+
+var mapArray = function(arr) {
+  var output = [[arr[0]]];
+  var outerIndex = 0;
+  var current = output[0].name;
+  for(var i = 0; i < arr.length; i++){
+    if(current === arr[i].name){
+      output[outerIndex].push(arr[i]);
+    } else {
+      current = arr[i].name;
+      outerIndex++;
+      output.push([arr[i]]);
+      console.log('mapArray console log output ', output);
+    }
+  }
+  return output;
+}
+
+var getInfo = function(track_url, cb){
+  console.log(track_url);
+  var url = "https://api.soundcloud.com/resolve?url=" + track_url + "&client_id=aa3e10d2de1e1304e62f07feb898e745&format=json&_status_code_map[302]=200";
+  $.getJSON(url, function(data) {
+    $.getJSON(data.location, function(response){
+      console.log(response);
+    });
+  });
+}
+
+var makePlaylist = function(songArray){
+  var arrayData = [];
+  for(var i = 0; i < songArray.length; i++){
+    arrayData.push({
+      stream_uri: songArray[i]['songData']['stream_url'],
+      title: songArray[i]['songData']['title']
     })
-    .catch(function(error) {
-      console.log("Error:", error);
-    });
+  }
+  return arrayData;
+}
 
-    // chrome.storage.sync.get('messages', function(localStorageObject){
-    //   $scope.messages = localStorageObject.messages;
-    // });
+SC.initialize({
+  client_id: 'aa3e10d2de1e1304e62f07feb898e745'
+});
 
-    // chrome.storage.onChanged.addListener(function(changes, namespace) {
-    //     if(changes['messages']){
-    //       $scope.messages = changes['messages']['newValue'];
-    //     }
-    // });
+$scope.name;
+$scope.messages = $firebaseArray(obj.ref);
+$scope.youtubeLinks = $firebaseArray(obj.youTubeRef);
+$scope.soundcloudLinks = $firebaseArray(obj.soundCloudRef);
+$scope.favorites = $firebaseArray(obj.favoriteMusicRef);
 
-    $scope.$on('LastRepeaterElement', function(){
-    });
+$scope.messages.$loaded()
+.then(function(data) {
+  $scope.messages = data;
+  $timeout(function(){
+    $scope.obj['loadingComplete'] = true;
+  }, 100);
+})
+.catch(function(error) {
+  console.log("Error:", error);
+});
 
-    User.fetchUserObjFromFirebase(function(nameString){
-      User.setName(nameString);
-      $scope.name = User.getName();
-      $scope.$apply();  
-    });
+$scope.$on('LastRepeaterElement', function(){
+});
 
-
-    $scope.ytTrustSrc = function(src) {
-      return $sce.trustAsResourceUrl("https://www.youtube.com/embed/" + src);
-    };
-
-    $scope.scTrustSrc = function(src) {
-      src = "https://w.soundcloud.com/player/?url=" + src + "&color=0066cc";
-      return $sce.trustAsResourceUrl(src);
-    };
-
-    $scope.trustSrc = function(src) {
-      console.log($sce.trustAsResourceUrl(src));
-      return $sce.trustAsResourceUrl(src);
-    };
-
-    $scope.addMessage = function() {
-      var ts = new Date();
-      ts = ts.toString();
-      console.log(obj);
-      obj.ref.push({
-        name: $scope.name, 
-        text: $scope.messageText, 
-        timeStamp: ts,
-        musicSource: false
-      });
-
-      $scope.messageText = "";
-    };
-
-    $scope.remove = function(url, yt, sc, fav){
-      var list;
-      if(yt){
-        list = $scope.youtubeLinks;
-        console.log('yt');
-      } 
-
-      if(sc){
-        list = $scope.soundcloudLinks;
-        console.log('sc');
-        console.log(list);
-        console.log(url);
-      }
-
-      if(fav){
-        list = $scope.favorites;
-        console.log('fav');
-        console.log(list);
-        console.log(url);
-      }
-
-      list.$remove(url).then(function(ref) {
-        console.log('removed');
-      });
-
-    };
-
-    $scope.formatTime = function(dateString){
-      var ts = moment(dateString).fromNow();
-      return ts;
-    };
-
-    $scope.show = function(isShowing){
-      return !isShowing;
-    };
-
-    $scope.logOff = function(){
-      $state.go('signIn');
-      User.setAuthObj(null);
-      User.setName(null);
-      User.unauth();
-    }
-
-    $scope.goToGetFirebaseRef = function(){
-      $state.go('firebase');
-    }
-
-    $scope.submitFeedback = function(feedback){
-      var submitRef = new Firebase('https://feedbackapp.firebaseio.com/');
-      var ts = new Date();
-      console.log($scope);
-      console.log(dataObj);
-      submitRef.push({
-        name: $scope.name, 
-        text: $scope.feedbackText, 
-        timeStamp: ts,
-        app: 'chat'
-      });
-
-      $scope.response = 'Thanks!';
-      $scope.$apply();
-      $scope.showHelp = false;
-      $scope.feedbackText = '';
-
-    }
-
-    $scope.hrefTag = function(href){
-      return '#' + $sce.trustAsResourceUrl(href);
-    }
-
-    $scope.addToFavorites = function(song , source, songData){
-      obj.favoriteMusicRef.push({
-        song : song,
-        source: source,
-        name: $scope.name,
-        songData : songData
-      });
-    }
-
-    $scope.playSongs = function(song, favorites, songFav){
-      var index = _.findIndex(favorites, function(chr) {
-        return chr == songFav;
-      });
-      var playList = makePlaylist(favorites);
-      console.log('index ', index);
-      console.log('playlist ', playList);
-      chrome.extension.getBackgroundPage().makeSongQueue(playList, index);
-      chrome.extension.getBackgroundPage().playSongQueue();
-    }
-
-    $scope.playSong = function(song, title){
-      chrome.extension.getBackgroundPage().playSoundcloud(song);
-      chrome.extension.getBackgroundPage().saveCurrenlyPlayingToSyncStorage(title, function(){
-        console.log('saved song name ', title);
-      });
-    }
+User.fetchUserObjFromFirebase(function(nameString){
+  User.setName(nameString);
+  $scope.name = User.getName();
+  $scope.$apply();  
+});
 
 
-    $scope.stopSong = function(){
-      chrome.extension.getBackgroundPage().stopSoundcloud();
-    }
+$scope.ytTrustSrc = function(src) {
+  return $sce.trustAsResourceUrl("https://www.youtube.com/embed/" + src);
+};
 
-    $scope.pauseSong = function(){
-      chrome.extension.getBackgroundPage().pauseSoundcloud();
-    }    
+$scope.scTrustSrc = function(src) {
+  src = "https://w.soundcloud.com/player/?url=" + src + "&color=0066cc";
+  return $sce.trustAsResourceUrl(src);
+};
+
+$scope.trustSrc = function(src) {
+  console.log($sce.trustAsResourceUrl(src));
+  return $sce.trustAsResourceUrl(src);
+};
+
+$scope.addMessage = function(val) {
+  var ts = new Date();
+  ts = ts.toString();
+  console.log(val);
+  obj.ref.push({
+    name: $scope.name, 
+    text: $scope.obj.messageText, 
+    timeStamp: ts,
+    musicSource: false
+  });
+
+  $scope.obj.messageText = "";
+};
+
+$scope.remove = function(url, yt, sc, fav){
+  var list;
+  if(yt){
+    list = $scope.youtubeLinks;
+    console.log('yt');
+  } 
+
+  if(sc){
+    list = $scope.soundcloudLinks;
+    console.log('sc');
+    console.log(list);
+    console.log(url);
+  }
+
+  if(fav){
+    list = $scope.favorites;
+    console.log('fav');
+    console.log(list);
+    console.log(url);
+  }
+
+  list.$remove(url).then(function(ref) {
+    console.log('removed');
+  });
+
+};
+
+$scope.formatTime = function(dateString){
+  var ts = moment(dateString).fromNow();
+  return ts;
+};
+
+$scope.show = function(isShowing){
+  return !isShowing;
+};
+
+$scope.logOff = function(){
+  $state.go('signIn');
+  User.setAuthObj(null);
+  User.setName(null);
+  User.unauth();
+}
+
+$scope.goToGetFirebaseRef = function(){
+  $state.go('firebase');
+}
+
+$scope.submitFeedback = function(feedback){
+  var submitRef = new Firebase('https://feedbackapp.firebaseio.com/');
+  var ts = new Date();
+  console.log($scope);
+  console.log(dataObj);
+  submitRef.push({
+    name: $scope.name, 
+    text: $scope.feedbackText, 
+    timeStamp: ts,
+    app: 'chat'
+  });
+
+  $scope.response = 'Thanks!';
+  $scope.$apply();
+  $scope.showHelp = false;
+  $scope.feedbackText = '';
+
+}
+
+$scope.hrefTag = function(href){
+  return '#' + $sce.trustAsResourceUrl(href);
+}
+
+$scope.addToFavorites = function(song , source, songData){
+  obj.favoriteMusicRef.push({
+    song : song,
+    source: source,
+    name: $scope.name,
+    songData : songData
+  });
+}
+
+$scope.playSongs = function(song, favorites, songFav){
+  var index = _.findIndex(favorites, function(chr) {
+    return chr == songFav;
+  });
+  var playList = makePlaylist(favorites);
+  console.log('index ', index);
+  console.log('playlist ', playList);
+  chrome.extension.getBackgroundPage().makeSongQueue(playList, index);
+  chrome.extension.getBackgroundPage().playSongQueue();
+}
+
+$scope.playSong = function(song, title){
+  chrome.extension.getBackgroundPage().playSoundcloud(song);
+  chrome.extension.getBackgroundPage().saveCurrenlyPlayingToSyncStorage(title, function(){
+    console.log('saved song name ', title);
+  });
+}
+
+
+$scope.stopSong = function(){
+  chrome.extension.getBackgroundPage().stopSoundcloud();
+}
+
+$scope.pauseSong = function(){
+  chrome.extension.getBackgroundPage().pauseSoundcloud();
+}    
 
 
 
-  }])
+}])
 
 .controller("RegisterCtrl", ["$scope", "$firebaseArray", "$state", "User",
   function($scope, $firebaseArray, $state, User){
@@ -509,8 +567,8 @@ return {
     };        
 
   }])
-.controller("firebaseCtrl", ["$scope", "$firebaseArray", "$state", "User",
-  function($scope, $firebaseArray, $state, User){
+.controller("firebaseCtrl", ["$scope", "$state", "User", "localStorage",
+  function($scope, $state, User, localStorage){
 
     $scope.update = function(){
       var temp = $scope.stringRef;
@@ -534,7 +592,7 @@ return {
       if(temp[temp.length - 2] === 'firebaseio'){
         obj['firebaseRef'] = $scope.stringRef;
         $scope.stringRef = '';
-        chrome.storage.sync.set(obj, function(){
+        chrome.storage.sync.get(obj, function(){
           console.log('saved firebase reference');
           $state.go('signIn');
         });
@@ -543,6 +601,7 @@ return {
           $scope.error = 'invalid firebase reference';
         }
       }
+
     }])
 .controller("helpCtrl", ["$scope", "$firebaseArray", "$state", "User",
   function($scope, $firebaseArray, $state, User){

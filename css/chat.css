@@ -64,6 +64,11 @@ input {
   margin: 1px auto;
 }
 
+#progressLoader {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
 em {
   font-style: normal;
   font-weight: bold;
@@ -74,7 +79,7 @@ em {
 #messagesDiv {
   background-color: white;
   overflow: auto;
-  height: 460px;
+  height: 360px;
   width: 100%;
   padding: 10px;
   padding-left: 0px;
@@ -173,6 +178,10 @@ img.soundTrash {
 }
 iframe {
   padding-left: 16px;
+}
+
+.card iframe {
+  margin-top: 12px;
 }
 
 .scCard {
