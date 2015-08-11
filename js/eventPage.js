@@ -29,6 +29,33 @@ Queue.prototype.remove = function() {
   return elem;
 };
 
+var updateIcon = function (type, cb){
+
+  if(currentIcon === 'playingSong' && type === 'openPopup'){
+    type = 'playingSong';
+  }
+
+  if(currentIcon === 'playingSong' && type === 'newMessage') {
+    type = 'playingSongNewMessage';
+  }
+
+  var iconPaths = {
+    'playingSong' : 'assets/audio.png',
+    'newMessage' : 'assets/diamond_red.png',
+    'default' : 'assets/diamond.png',
+    'playingSongNewMessage' : 'assets/audio_red.png',
+    'stopPlayingSong' : 'assets/diamond.png',
+    'endedSong' : 'assets/diamond.png',
+    'pausePlayingSong' : 'assets/diamond.png',
+    'openPopup' : 'assets/diamond'
+  }
+
+  chrome.browserAction.setIcon({path: iconPaths[type]}, function(){
+    cb();
+  });
+  currentIcon = type;
+}
+
 var setRef = function(ref){
   messagesRef = ref;
 }
@@ -142,36 +169,6 @@ var pushToFbaseChat = function(source, id, ts, chatRef){
   }
 };
 
-var updateIcon = function (type, cb){
-
-  if(currentIcon === 'playingSong' && type === 'openPopup'){
-    type = 'playingSong';
-  }
-
-  if(currentIcon === 'playingSong' && type === 'newMessage') {
-    currentIcon = 'playingSongNewMessage';
-  }
-
-  if(currentIcon === 'playingSong' && type === 'openPopup') {
-    type = 'playingSong';
-  }
-
-  var iconPaths = {
-    'playingSong' : 'assets/audio.png',
-    'newMessage' : 'assets/diamond_red.png',
-    'default' : 'assets/diamond.png',
-    'playingSongNewMessage' : 'assets/audio_red.png',
-    'stopPlayingSong' : 'assets/diamond.png',
-    'endedSong' : 'assets/diamond.png',
-    'pausePlayingSong' : 'assets/diamond.png',
-    'openPopup' : 'assets/diamond'
-  }
-
-  chrome.browserAction.setIcon({path: iconPaths[type]}, function(){
-    cb();
-  });
-  currentIcon = type;
-}
 
 var playSoundcloud = function (song){
   var audioElem = document.getElementById('audioElem');

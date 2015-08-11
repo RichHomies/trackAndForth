@@ -64,11 +64,11 @@
     </div>
 
 
-    <div id='messagesDiv' scroll-glue='!glued'>
+    <div id='messagesDiv'>
       <div ng-repeat='message in messages | orderBy: reverse' emit-last-repeater-element>
         <!-- <div class='card-panel word' > -->
 
-        <div class='card-panel word' ng-click='show = !show'>
+        <div class='card-panel word chats' ng-click='show = !show'>
           <!-- displays the user name -->
           <strong>{{message.name}} </strong>| {{formatTime(message.timeStamp)}} |
 
@@ -89,7 +89,15 @@
             <div ng-if='showSoundCloud' scroll-if="showSoundCloud" id='{{message.text}}' align='middle'>
 
               <a href="">
-                <img src="{{message.songData.artwork_url}}" ng-click='playSong(message.songData.stream_url, message.songData.title)'>
+
+
+
+
+                <img ng-if='!message.songData.artwork_url' src="../assets/soundcloud.png" ng-click='playSong(message.songData.stream_url, message.songData.title)'>
+                <img ng-if='message.songData.artwork_url' ng-src="{{message.songData.artwork_url}}" ng-click='playSong(message.songData.stream_url, message.songData.title)'>
+
+
+
                 <div>{{message.songData.title}}</div>
                 <a href="" ng-click='playSong(message.songData.stream_url, message.songData.title)'><i class="material-icons">play_arrow</i></a>
                 <a href="" dontScroll='true' ng-click='pauseSong()'><i class="material-icons">pause</i></a>
@@ -124,7 +132,8 @@
                   <div class="col s12 m7 ">
                     <div class="card">
                       <div class="card-image">
-                        <img ng-src="{{favorite.songData.artwork_url || trustSrc('../assets/soundcloud.png')}}" ng-click='playSongs(favorite.songData.stream_url, favorites, favorite)'>
+                        <img ng-if='!favorite.songData.artwork_url' src="../assets/soundcloud.png" ng-click='playSongs(favorite.songData.stream_url, favorites, favorite)'>
+                        <img ng-if='favorite.songData.artwork_url' ng-src="{{favorite.songData.artwork_url}}" ng-click='playSongs(favorite.songData.stream_url, favorites, favorite)'>
                       </div>
                       <div class='card-info'>
                         <div class="card-content">
