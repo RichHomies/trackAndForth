@@ -15,7 +15,8 @@
     "storage", 
     "notifications",
     "background",
-    "contextMenus"
+    "contextMenus",
+    "tabs"
     ],
     "background": {
       "page": "background.html",

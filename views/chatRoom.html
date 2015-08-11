@@ -58,7 +58,6 @@
       </button>
     </div>
 
-
     <div align='middle' >
       <i  class='medium material-icons'>forum</i>
     </div>
@@ -73,7 +72,7 @@
           <strong>{{message.name}} </strong>| {{formatTime(message.timeStamp)}} |
 
           <!-- if the message is text display the user's chat message-->
-          <span ng-if='!message.musicSource'>{{message.text}}</span>
+          <span ng-if='!message.musicSource' ng-bind-html="message.text | linky" ng-click='openTab(message.text)'></span>
           <!-- else, if the message is from youtube, show the youtube player in chat -->
           <span ng-if='message.musicSource === "yt"'>
             <span ng-model='showVideo' ng-init='showVideo = false' ng-click='showVideo = !showVideo; scroll(message.text)'> <a href="">shared a song from youtube.</a></span>   

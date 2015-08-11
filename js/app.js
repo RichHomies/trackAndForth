@@ -337,7 +337,7 @@ factory('localStorage', function(){
     var scrollToLastChat = function(){
       $timeout(function(){
         var elems = document.getElementsByClassName('chats');
-        var elem = elems[elems.length - 1];
+        var elem = elems[elems.length - 10];
         elem.scrollIntoView();
         console.log('scrolled');
       }, 100);
@@ -518,7 +518,15 @@ factory('localStorage', function(){
       chrome.extension.getBackgroundPage().pauseSoundcloud();
     }    
 
-
+    $scope.openTab = function (uri){
+      console.log(uri);
+      var tarea = uri;
+      if (tarea.indexOf("http://")==0 || tarea.indexOf("https://")==0) {
+          chrome.tabs.create({url: uri});
+      } else {
+        chrome.tabs.create({url: 'http://' + uri});
+      }
+    }
 
   }])
 
