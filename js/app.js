@@ -527,9 +527,12 @@ factory('localStorage', function(){
     }
 
   }])
+//create spotify controller and view, create search engine, displays hits, clicking pushes to FB, add spotify iframe
 
 .controller("RegisterCtrl", ["$scope", "$firebaseArray", "$state", "User",
   function($scope, $firebaseArray, $state, User){
+    var obj = User.getRef();
+
     $scope.obj = {
       loading: false
     }
@@ -656,6 +659,8 @@ factory('localStorage', function(){
         $scope.stringRef = '';
         chrome.storage.sync.set(obj, function(){
           console.log('saved firebase reference');
+          User.setStr(obj['firebaseRef']);
+          User.initRef();
           $state.go('signIn');
         });
       } else  {
