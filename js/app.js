@@ -38,10 +38,12 @@ var app = angular.module("chatApp", ["firebase", "luegg.directives", 'ui.router'
 
 })
 .run(function(User, $state){
-  chrome.extension.getBackgroundPage().updateIcon('openPopup', function(){
-    console.log('opened popup');
-  });
+
     User.fetchFromLocalStorage(function(localStorageObject){
+      chrome.extension.getBackgroundPage().updateIcon('openPopup', function(){
+        console.log('openPopup');
+      });
+
       var refExists = localStorageObject.firebaseRef;
       refExists = '' + refExists; 
       if(refExists){
@@ -72,6 +74,7 @@ var app = angular.module("chatApp", ["firebase", "luegg.directives", 'ui.router'
       }
     });
   
+
 
 })
 .factory('User', function ($state, $http) {
@@ -178,6 +181,16 @@ var fetchFromLocalStorage =  function(cb){
   });
 }
 
+var userNameIsUnique = function(name, cb){
+  userRef.on('value', function(snapshot){
+    var names = {};
+    var nameIsTaken = _.includes(snapshot.val(), name, 0);
+    cb(null, nameIsTaken);
+  }, function (errorObject) {
+    cb(errorObject);
+  });
+}
+
 return {
   saveUserObjToFirebase : saveUserObjToFirebase,
   fetchUserObjFromFirebase : fetchUserObjFromFirebase,
@@ -196,7 +209,8 @@ return {
   getRef : getRef,
   fetchFromLocalStorage : fetchFromLocalStorage, 
   initRef : initRef,
-  initAuthDependentRef : initAuthDependentRef
+  initAuthDependentRef : initAuthDependentRef,
+  userNameIsUnique : userNameIsUnique
 };
 
 
@@ -240,8 +254,19 @@ factory('localStorage', function(){
 .controller("ChatCtrl", ["$scope","$firebaseArray", "User", "$state", "$sce", "$http", "$anchorScroll", "$location", "$timeout",
   // we pass our new chatMessages factory into the controller
   function($scope, $firebaseArray, User, $state, $sce, $http, $anchorScroll, $location, $timeout) {
+    //get firebase references, such that we can leverage them addmessage, 
     var obj = User.getRef();
-    console.log(obj);
+
+    //get's the user's name and sets the name to controller
+    User.fetchUserObjFromFirebase(function(nameString){
+      if(nameString){
+        User.setName(nameString);
+        $scope.name = User.getName();
+        $scope.$apply();  
+      } else {
+        $state.go('name');
+      }
+    });
 
     var updateTitle = function(songTitle){
       $scope.songPlaying = true;
@@ -249,6 +274,46 @@ factory('localStorage', function(){
       songTitle = songTitle ? 'Currently Playing: ' + songTitle : 'chattin n shit';
       chrome.browserAction.setTitle({title:songTitle});
       $scope.$apply();
+    }
+
+    var mapArray = function(arr) {
+      var output = [[arr[0]]];
+      var outerIndex = 0;
+      var current = output[0].name;
+      for(var i = 0; i < arr.length; i++){
+        if(current === arr[i].name){
+          output[outerIndex].push(arr[i]);
+        } else {
+          current = arr[i].name;
+          outerIndex++;
+          output.push([arr[i]]);
+          console.log('mapArray console log output ', output);
+        }
+      }
+      return output;
+    }
+
+    var makePlaylist = function(songArray){
+      var arrayData = [];
+      console.log('songArray makePlaylist ', songArray);
+      for(var i = 0; i < songArray.length; i++){
+        if(songArray[i].source === 'sc'){
+          arrayData.push({
+            stream_uri: songArray[i]['songData']['stream_url'],
+            title: songArray[i]['songData']['title']
+          });      
+        }
+      }
+      return arrayData;
+    }
+
+    var scrollToLastChat = function(){
+      $timeout(function(){
+        var elems = document.getElementsByClassName('chats');
+        var elem = elems[elems.length - 10];
+        elem.scrollIntoView();
+        console.log('scrolled');
+      }, 100);
     }
 
     chrome.storage.sync.get('currentlyPlaying', function(localStorageObject){
@@ -290,63 +355,6 @@ factory('localStorage', function(){
       }
     });
 
-
-
-
-    var mapArray = function(arr) {
-      var output = [[arr[0]]];
-      var outerIndex = 0;
-      var current = output[0].name;
-      for(var i = 0; i < arr.length; i++){
-        if(current === arr[i].name){
-          output[outerIndex].push(arr[i]);
-        } else {
-          current = arr[i].name;
-          outerIndex++;
-          output.push([arr[i]]);
-          console.log('mapArray console log output ', output);
-        }
-      }
-      return output;
-    }
-
-    var getInfo = function(track_url, cb){
-      console.log(track_url);
-      var url = "https://api.soundcloud.com/resolve?url=" + track_url + "&client_id=aa3e10d2de1e1304e62f07feb898e745&format=json&_status_code_map[302]=200";
-      $.getJSON(url, function(data) {
-        $.getJSON(data.location, function(response){
-          console.log(response);
-        });
-      });
-    }
-
-    var makePlaylist = function(songArray){
-      var arrayData = [];
-      console.log('songArray makePlaylist ', songArray);
-      for(var i = 0; i < songArray.length; i++){
-        if(songArray[i].source === 'sc'){
-          arrayData.push({
-            stream_uri: songArray[i]['songData']['stream_url'],
-            title: songArray[i]['songData']['title']
-          });      
-        }
-      }
-      return arrayData;
-    }
-
-    var scrollToLastChat = function(){
-      $timeout(function(){
-        var elems = document.getElementsByClassName('chats');
-        var elem = elems[elems.length - 10];
-        elem.scrollIntoView();
-        console.log('scrolled');
-      }, 100);
-    }
-
-    SC.initialize({
-      client_id: 'aa3e10d2de1e1304e62f07feb898e745'
-    });
-
     $scope.name;
     $scope.messages = $firebaseArray(obj.ref);
     $scope.youtubeLinks = $firebaseArray(obj.youTubeRef);
@@ -368,15 +376,6 @@ factory('localStorage', function(){
     $scope.$on('LastRepeaterElement', function(){
     });
 
-    console.log('messages ', $scope.messages);
-
-
-
-    User.fetchUserObjFromFirebase(function(nameString){
-      User.setName(nameString);
-      $scope.name = User.getName();
-      $scope.$apply();  
-    });
 
 
     $scope.ytTrustSrc = function(src) {
@@ -475,7 +474,6 @@ factory('localStorage', function(){
       $scope.$apply();
       $scope.showHelp = false;
       $scope.feedbackText = '';
-
     }
 
     $scope.hrefTag = function(href){
@@ -532,14 +530,20 @@ factory('localStorage', function(){
 
 .controller("RegisterCtrl", ["$scope", "$firebaseArray", "$state", "User",
   function($scope, $firebaseArray, $state, User){
+    $scope.obj = {
+      loading: false
+    }
 
     $scope.registerUser = function(username, password) {
       $scope.registerEmail = '';
       $scope.registerPassword = '';
+      $scope.obj.loading = true;
+
       User.registerUser(username, password, function(error, authData) {
         if(error) { 
           console.log("Error creating user", error);
           $scope.error = error.message;
+          $scope.obj.loading = false;
           $scope.$apply();
         } else {
           console.log("registered user");
@@ -567,17 +571,22 @@ factory('localStorage', function(){
 
 .controller("SignInCtrl", ["$scope", "$firebaseArray", "$state", "User",
   function($scope, $firebaseArray, $state, User){
+    $scope.obj = {
+      loading: false
+    }
 
     $scope.signIn = function(username, password) {
       $scope.signInEmail = '';
       $scope.signInPassword = '';
+      //need to add loading
+      $scope.obj.loading = true;
       User.signIn(username, password, function(error, authData) {
         if (error) {
           console.log("Login Failed!", error);
           $scope.error = error.message;
+          $scope.obj.loading = false;
           $scope.$apply();
         } else {
-          console.log(authData);
           User.setAuthObj(authData);
           User.initAuthDependentRef();
           $state.go('messages');
@@ -593,12 +602,30 @@ factory('localStorage', function(){
 
 .controller("NameCtrl", ["$scope", "$firebaseArray", "$state", "User",
   function($scope, $firebaseArray, $state, User){
-    // angular.extend($scope, User);
+
     $scope.saveName = function(name){
-      User.setName(name);
-      User.saveUserObjToFirebase();
-      soonToBeNamed = '';
-      $state.go('messages');
+      if(name.length < 20){
+        User.userNameIsUnique(name, function(error, isNameNotAvailable){
+          if(error){
+            console.log(error);
+            $scope.error = 'We made an error, please resubmit your name.';
+          }
+
+          if(isNameNotAvailable) {
+            $scope.error = name + ' is already taken. Please try again.';
+          } else {
+            User.setName(name);
+            User.saveUserObjToFirebase();
+            soonToBeNamed = '';
+            $state.go('messages');
+          }
+
+        });
+      } else {
+        $scope.error = 'Name must be less than 20 characters';
+      }
+
+
     };        
 
   }])

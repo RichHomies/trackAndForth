@@ -10,7 +10,7 @@ module.exports = function(config) {
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-    frameworks: ['mocha'],
+    frameworks: ['mocha', 'chai'],
 
 
     // list of files / patterns to load in the browser
@@ -28,13 +28,13 @@ module.exports = function(config) {
       "js/soundCloudSDK.js",
       "bower_components/angular-mocks/angular-mocks.js",
       "js/app.js",
-      "node_modules/expect.js/index.js",
-      'test/*.js'
-    ],
+      // "node_modules/expect.js/index.js",
+      'test/firebaseSpec.js'
+      ],
 
     // list of files to exclude
     exclude: [
-      'karma.conf.js'
+    'karma.conf.js'
     ],
 
 
@@ -74,6 +74,7 @@ module.exports = function(config) {
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
-    singleRun: false
+    singleRun: false,
+
   });
 };

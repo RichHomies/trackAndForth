@@ -47,7 +47,7 @@ var updateIcon = function (type, cb){
     'stopPlayingSong' : 'assets/diamond.png',
     'endedSong' : 'assets/diamond.png',
     'pausePlayingSong' : 'assets/diamond.png',
-    'openPopup' : 'assets/diamond'
+    'openPopup' : 'assets/diamond.png'
   }
 
   chrome.browserAction.setIcon({path: iconPaths[type]}, function(){

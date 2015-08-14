@@ -1,4 +1,52 @@
 <div id='signInView' ng-controller='SignInCtrl' class='container'>
+<div ng-if="obj.loading">
+   <div class="preloader-wrapper big active">
+      <div class="spinner-layer spinner-blue">
+        <div class="circle-clipper left">
+          <div class="circle"></div>
+        </div><div class="gap-patch">
+          <div class="circle"></div>
+        </div><div class="circle-clipper right">
+          <div class="circle"></div>
+        </div>
+      </div>
+
+      <div class="spinner-layer spinner-red">
+        <div class="circle-clipper left">
+          <div class="circle"></div>
+        </div><div class="gap-patch">
+          <div class="circle"></div>
+        </div><div class="circle-clipper right">
+          <div class="circle"></div>
+        </div>
+      </div>
+
+      <div class="spinner-layer spinner-yellow">
+        <div class="circle-clipper left">
+          <div class="circle"></div>
+        </div><div class="gap-patch">
+          <div class="circle"></div>
+        </div><div class="circle-clipper right">
+          <div class="circle"></div>
+        </div>
+      </div>
+
+      <div class="spinner-layer spinner-green">
+        <div class="circle-clipper left">
+          <div class="circle"></div>
+        </div><div class="gap-patch">
+          <div class="circle"></div>
+        </div><div class="circle-clipper right">
+          <div class="circle"></div>
+        </div>
+      </div>
+    </div>
+</div>      
+
+
+
+
+<div ng-if='!obj.loading'>
   <div>sign in, please</div>
   <div ng-show='error'>{{error}}</div>
   <form id='signInUser' autocomplete='on' ng-submit='signIn(signInEmail, signInPassword)'>
@@ -9,4 +57,6 @@
     </button>
   </form>
   <a class='waves-effect waves-teal btn-flat' ng-click='goToRegister()'>sign up</a>
+</div>
+
 </div>
