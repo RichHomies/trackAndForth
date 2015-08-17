@@ -218,6 +218,16 @@ var pauseSoundcloud = function () {
   });
 }
 
+var resumeSoundcloud =  function(){
+  var audioElem = document.getElementById('audioElem');
+  if(audioElem.attributes[0].value){
+    audioElem.play();
+    updateIcon('playingSong', function(){
+      console.log('updated icon play');
+    });
+  }
+}
+
 var makeSongQueue =  function(songs, index){
   soundcloudQueue = new Queue();
   for(var i = index; i < songs.length; i++){

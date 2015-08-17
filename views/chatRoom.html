@@ -117,7 +117,10 @@
     </form>
 
     <div>
-      <img src="./assets/playing.png"> <div>{{songTitle}}</div>
+      <img src="./assets/playing.png"> <div>{{obj.songTitle}}</div>
+      <a href="" ng-click='resumeSong()'><i class="material-icons">play_arrow</i></a>
+      <a href="" ng-click='pauseSong()'><i class="material-icons">pause</i></a>
+      <a href="" ng-click='stopSong()'><i class="material-icons">stop</i></a>
     </div>
 
     <div ng-if='favorites.length' id='fav'>

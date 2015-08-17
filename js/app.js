@@ -270,7 +270,7 @@ factory('localStorage', function(){
 
     var updateTitle = function(songTitle){
       $scope.songPlaying = true;
-      $scope.songTitle = songTitle;
+      $scope.obj['songTitle'] = songTitle;
       songTitle = songTitle ? 'Currently Playing: ' + songTitle : 'chattin n shit';
       chrome.browserAction.setTitle({title:songTitle});
       $scope.$apply();
@@ -515,6 +515,10 @@ factory('localStorage', function(){
     $scope.pauseSong = function(){
       chrome.extension.getBackgroundPage().pauseSoundcloud();
     }    
+
+    $scope.resumeSong = function(){
+      chrome.extension.getBackgroundPage().resumeSoundcloud();
+    }   
 
     $scope.openTab = function (uri){
       console.log(uri);
