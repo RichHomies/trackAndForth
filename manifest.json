@@ -16,7 +16,8 @@
     "notifications",
     "background",
     "contextMenus",
-    "tabs"
+    "tabs",
+    "identity"
     ],
     "background": {
       "page": "background.html",
