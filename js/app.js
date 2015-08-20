@@ -78,6 +78,7 @@ var app = angular.module("chatApp", ["firebase", "luegg.directives", 'ui.router'
 
 })
 .factory('User', function ($state, $http) {
+  
   var str = '';
   var ref;
   var userRef;
@@ -674,11 +675,22 @@ factory('localStorage', function(){
       }
 
     }])
-.controller("helpCtrl", ["$scope", "$firebaseArray", "$state", "User",
-  function($scope, $firebaseArray, $state, User){
+.controller("helpCtrl", ["$scope", "$firebaseArray", "$state", "User", "$sce",
+  function($scope, $firebaseArray, $state, User, $sce){
+    $scope.links = {
+      firebase: "St5Au55t17M", 
+      howTo: "jYJprzXsZU4"
+    };    
+
     $scope.goBack =  function(){
       $state.go('firebase');
     }
+
+    $scope.ytTrustSrc = function(src) {
+      return $sce.trustAsResourceUrl("https://www.youtube.com/embed/" + src);
+    };
+
+
   }])
 .directive('emitLastRepeaterElement', function() {
   return function(scope) {

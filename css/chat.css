@@ -209,6 +209,10 @@ iframe {
   width: 60%;
 }
 
+.helpFrames{
+  padding-left: 12px;  
+  padding-right: 12px;  
+}
 
 .card-image{ 
   display:inline-block; 
