@@ -252,6 +252,29 @@ factory('localStorage', function(){
   };
 
 })
+.factory('Rooms', function(){
+
+  var createRoom = function(){
+
+  }
+
+  var destroyRoom = function(){
+
+  }
+
+  var swithRooms = function(){
+
+  }
+
+  var getUsersInRoom = function(){
+
+  }
+
+  var getMyRoom = function(){
+    
+  }
+
+})
 .controller("ChatCtrl", ["$scope","$firebaseArray", "User", "$state", "$sce", "$http", "$anchorScroll", "$location", "$timeout",
   // we pass our new chatMessages factory into the controller
   function($scope, $firebaseArray, User, $state, $sce, $http, $anchorScroll, $location, $timeout) {
