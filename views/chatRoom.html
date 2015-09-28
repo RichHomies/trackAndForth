@@ -53,9 +53,14 @@
   <div ng-if='obj.loadingComplete'>
 
     <div id='logout'>
-      <button class='btn waves-effect waves-light' type='submit' ng-click='logOff()'>log off
-        <i class='material-icons'></i>
-      </button>
+      <a ui-sref="hall">
+        <button class='btn waves-effect waves-light' type='submit' ng-click='logOff()'>log off
+          <i class='material-icons'></i>
+        </button>
+      </a>
+    </div>
+    <div id='hall'>
+      <a ui-sref="hall">Home</a>
     </div>
 
     <div align='middle' >
