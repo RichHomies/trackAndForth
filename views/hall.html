@@ -2,8 +2,10 @@
 <a class="waves-effect waves-light btn-large topBtns">Log Out</a>
 <a class="waves-effect waves-light btn createBtn" ui-sref='createRoom'>CREATE A NEW ROOM</a>
 
-<div>
-  <span class='roomName'>Room Name</span>
-  <span class='roomMembers'>Room Members</span>
-  <i class="material-icons right sendIcon" >send</i>
+<div ng-repeat='(key, room) in rooms'>
+  <span class='roomName'>{{key}}</span>
+  <span ng-repeat='name in room.names' class='rommNames'>
+    <span class='roomMembers'>{{name}}</span>
+  </span>
+  <i class="material-icons right sendIcon" ng-click='goToRoom(key)'>send</i>
 </div>

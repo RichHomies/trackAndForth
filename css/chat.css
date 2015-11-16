@@ -34,7 +34,7 @@ input {
 }
 
 #fav {
-  padding-bottom: 12px;
+  padding-bottom: 0px;
 }
 
 #queueIcon {
@@ -252,3 +252,51 @@ iframe {
   -webkit-font-feature-settings: 'liga';
   -webkit-font-smoothing: antialiased;
 }
+
+.topBtns {
+  width: 247px;
+  top: -12px;
+  font-size: 18px;
+}
+
+
+.createRoomFormContainer{
+  margin: 25px;
+}
+
+.createBtn {
+  width: 100%;
+  top: -7px;
+}
+
+.roomName {
+  width: 40%;
+}
+
+.roomMembers {
+  width:50%;
+}
+
+.sendIcon {
+  width: 8%;
+}
+
+.roomName {
+  font-size: 26px;
+}
+
+.rommNames{
+  font-size: 14px;
+}
+
+
+
+
+
+
+
+
+
+
+
+

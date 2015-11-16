@@ -5,6 +5,7 @@ var nameString;
 var currentIcon = 'default'; 
 var soundcloudQueue;
 var currentSong;
+var currentRoom = 'roomName';
 
 var Queue = function() {
   this._storage = {};
@@ -103,9 +104,9 @@ var contextMenuHandlerPushSongToFirebase = function(song){
   var obj = {};
   obj['firebaseRef'] = true;
   chrome.storage.sync.get(obj, function(localStorageObject){
-    var ytref = new Firebase(localStorageObject.firebaseRef + "/youtube");
-    var scref = new Firebase(localStorageObject.firebaseRef + "/soundcloud");
-    var ref = new Firebase(localStorageObject.firebaseRef + "/chat");
+    var ytref = new Firebase(localStorageObject.firebaseRef).child(currentRoom).child('youtube');
+    var chatRef = new Firebase(localStorageObject.firebaseRef).child(currentRoom).child('messages');
+
     var id;
     var ts = new Date();
     ts = ts.toString();
@@ -121,22 +122,9 @@ var contextMenuHandlerPushSongToFirebase = function(song){
     soundcloudCheck = soundcloudCheck[1].split('.');
 
     if(soundcloudCheck[0] === 'soundcloud'){
-      pushToFbase(scref,'sc', song, ts, ref);
+      pushToFbaseChat('sc', song, ts, chatRef);
     }
   });
-};
-
-var pushToFbase = function(ref, source, id, ts, chatRef){
-  if(nameString){
-    ref.push({
-      name: nameString, 
-      text: id, 
-      timeStamp: ts
-    });
-    pushToFbaseChat(source, id, ts, chatRef);
-  } else {
-    alert('you are not logged in');
-  }
 };
 
 var pushToFbaseChat = function(source, id, ts, chatRef){

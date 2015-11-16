@@ -1,8 +1,14 @@
+//just created room and saved room name to background page from hall ctrl
+
+//next: display rooms in hall, once the rootref, map the roomnames, display, and let the user join a room
+
+
 var app = angular.module("chatApp", ["firebase", "luegg.directives", 'ui.router', 'ngSanitize'])
 
 .config(function($stateProvider, $urlRouterProvider, $compileProvider){
 
   $urlRouterProvider.otherwise("/firebase");
+
 
 
   $stateProvider
@@ -32,6 +38,16 @@ var app = angular.module("chatApp", ["firebase", "luegg.directives", 'ui.router'
     url: "/messages",
     templateUrl: "views/chatRoom.html",
     controller : "ChatCtrl"
+  })
+  .state('hall', {
+    url: "/hall",
+    templateUrl: "views/hall.html",
+    controller : "hallCtrl"
+  })
+  .state('createRoom', {
+    url: "/createRoom",
+    templateUrl: "views/createRoom.html",
+    controller : "hallCtrl"
   });
 
   $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|chrome-extension):/);
@@ -39,54 +55,55 @@ var app = angular.module("chatApp", ["firebase", "luegg.directives", 'ui.router'
 })
 .run(function(User, $state){
 
-    User.fetchFromLocalStorage(function(localStorageObject){
-      chrome.extension.getBackgroundPage().updateIcon('openPopup', function(){
-        console.log('openPopup');
-      });
-
-      var refExists = localStorageObject.firebaseRef;
-      refExists = '' + refExists; 
-      if(refExists){
-        var firebaseIdentifier = refExists.split('.');
-        firebaseIdentifier = firebaseIdentifier[1];
-        if(firebaseIdentifier === 'firebaseio'){
-          User.setStr(refExists);
-          User.initRef();
-          console.log('run check ref exists');
-          var userIsLoggedIn = User.isAuth();
-          if(userIsLoggedIn){
-            User.setAuthObj(userIsLoggedIn);
-            User.initAuthDependentRef();
-            console.log('run check user is logged in');
-            $state.go('messages');
-          } else {
-            console.log('run check user is not logged in');
-            $state.go('signIn');
-          }
-        } else {
-          console.log('invalid firebase reference string, need to set a new reference string');
-          $state.go('firebase');       
-        }
-
-      } else {
-        console.log('run check, fb ref does not exist');
-        $state.go('firebase');
-      }
+  User.fetchFromLocalStorage(function(localStorageObject){
+    chrome.extension.getBackgroundPage().updateIcon('openPopup', function(){
+      console.log('openPopup');
     });
-  
+
+    var refExists = localStorageObject.firebaseRef;
+    refExists = '' + refExists; 
+    if(refExists){
+      var firebaseIdentifier = refExists.split('.');
+      firebaseIdentifier = firebaseIdentifier[1];
+      if(firebaseIdentifier === 'firebaseio'){
+        User.setStr(refExists);
+        User.initRef();
+        console.log('run check ref exists');
+        var userIsLoggedIn = User.isAuth();
+        if(userIsLoggedIn){
+          User.setAuthObj(userIsLoggedIn);
+          User.initAuthDependentRef();
+          console.log('run check user is logged in');
+          $state.go('messages');
+        } else {
+          console.log('run check user is not logged in');
+          $state.go('signIn');
+        }
+      } else {
+        console.log('invalid firebase reference string, need to set a new reference string');
+        $state.go('firebase');       
+      }
+
+    } else {
+      console.log('run check, fb ref does not exist');
+      $state.go('firebase');
+    }
+  });
+
 
 
 })
 .factory('User', function ($state, $http) {
-  
+
   var str = '';
+  var rootRef;
   var ref;
   var userRef;
-  var youTubeRef;
-  var soundCloudRef;
+  var messageRef;
   var favoriteMusicRef;
   var authDataObj;
   var name;
+  var roomName;
 
   var setName = function(nameStr){
     name = nameStr;
@@ -106,6 +123,7 @@ var app = angular.module("chatApp", ["firebase", "luegg.directives", 'ui.router'
   }
   //pick up from up here
   var saveUserObjToFirebase = function() {
+    rootRef.child('names').child(authDataObj.uid).set(name);
     userRef.child(authDataObj.uid).set(name);
   };
 
@@ -118,12 +136,13 @@ var app = angular.module("chatApp", ["firebase", "luegg.directives", 'ui.router'
   };
 
   var unauth = function(){
-   ref.unauth();
+   rootRef.unauth();
    chrome.extension.getBackgroundPage().nameString = '';
+   chrome.extension.getBackgroundPage().currentRoom = '';
  };
 
  var isAuth = function(){
-  var obj = ref.getAuth();
+  var obj = rootRef.getAuth();
   if(obj === null){
     return false;
   } else {
@@ -132,7 +151,7 @@ var app = angular.module("chatApp", ["firebase", "luegg.directives", 'ui.router'
 };
 
 var registerUser = function(username, password, cb) {
-  ref.createUser({
+  rootRef.createUser({
     email: username,
     password: password
   }, function(error, authData) {
@@ -141,7 +160,7 @@ var registerUser = function(username, password, cb) {
 };
 
 var signIn = function(username, password, cb) {
-  ref.authWithPassword({
+  rootRef.authWithPassword({
     email: username,
     password: password
   }, function(error, authData) {
@@ -150,29 +169,35 @@ var signIn = function(username, password, cb) {
 };
 
 var initRef = function(){
-  ref = new Firebase(str + "/chat");
-  userRef = new Firebase(str + '/usersInfo');
-  youTubeRef = new Firebase(str + "/youtube");
-  soundCloudRef = new Firebase(str + "/soundcloud");
+  rootRef = new Firebase(str);
+  ref = rootRef.child('rooms').child('roomName');
+  userRef = ref.child('users');
+  messageRef = ref.child('messages');
 }
 
 var initAuthDependentRef =  function(){
-  favoriteMusicRef = new Firebase(str + 'favoriteMusic/' + ref.getAuth().uid);
+  favoriteMusicRef = ref.child('favorites').child(ref.getAuth().uid);
+}
+
+var arrOfRoomsAndUsers = function(){
+  var arr = _.map
 }
 
 var setStr = function(data){
   str = data;
 }
 
-var getRef = function(){
+
+var getRef = function(roomName){
   return {
-    ref : ref,
-    userRef : userRef,
-    youTubeRef : youTubeRef,
-    soundCloudRef : soundCloudRef,
-    favoriteMusicRef : favoriteMusicRef
+    rootRef : rootRef,
+    ref : rootRef.child('rooms').child(roomName),
+    userRef : rootRef.child('rooms').child(roomName).child('users'),
+    messageRef : rootRef.child('rooms').child(roomName).child('messages'),
+    favoriteMusicRef : rootRef.child('rooms').child(roomName).child('favorites').child(ref.getAuth().uid)
   };
 }
+
 
 var fetchFromLocalStorage =  function(cb){
   var obj = {};
@@ -182,8 +207,8 @@ var fetchFromLocalStorage =  function(cb){
   });
 }
 
-var userNameIsUnique = function(name, cb){
-  userRef.on('value', function(snapshot){
+var userNameIsUnique = function(name, cb){//update
+  rootRef.child('names').on('value', function(snapshot){
     var names = {};
     var nameIsTaken = _.includes(snapshot.val(), name, 0);
     cb(null, nameIsTaken);
@@ -191,6 +216,25 @@ var userNameIsUnique = function(name, cb){
     cb(errorObject);
   });
 }
+
+var createRoom = function(rmName){
+    rootRef.child('rooms').child(rmName).child('names').child(authDataObj.uid).set(name);
+    chrome.extension.getBackgroundPage().currentRoom = rmName;
+}
+
+var goToRoom = function(rmName){
+  chrome.extension.getBackgroundPage().currentRoom = rmName;
+}
+
+var getRoomName = function(){
+  return chrome.extension.getBackgroundPage().currentRoom;
+}
+
+var getRootRef = function(){
+  return rootRef;
+}
+
+
 
 return {
   saveUserObjToFirebase : saveUserObjToFirebase,
@@ -204,14 +248,16 @@ return {
   getAuthObj : getAuthObj,
   ref : ref,
   isAuth : isAuth,
-  youTubeRef: youTubeRef,
-  soundCloudRef : soundCloudRef,
   setStr : setStr,
   getRef : getRef,
   fetchFromLocalStorage : fetchFromLocalStorage, 
   initRef : initRef,
   initAuthDependentRef : initAuthDependentRef,
-  userNameIsUnique : userNameIsUnique
+  userNameIsUnique : userNameIsUnique,
+  createRoom : createRoom,
+  getRoomName: getRoomName,
+  getRootRef : getRootRef,
+  goToRoom  : goToRoom
 };
 
 
@@ -252,34 +298,149 @@ factory('localStorage', function(){
   };
 
 })
-.factory('Rooms', function(){
+.factory('Hall', function(){
+    var rootRef;
+    var usersRef;
+    var roomsRef;
 
-  var createRoom = function(){
+  var initApplicationRefs = function(str){
+    rootRef = new Firebase(str);
+    usersRef = rootRef.child('users');
+    roomsRef = rootRef.child('rooms');
+    var rooms = [];
+    roomsRef.child("roomNames").once("value", function(data) {
+      var response = data.val();
+      for(var key in response){
+        rooms.push(key);
+      }
+    });
 
-  }
 
-  var destroyRoom = function(){
 
-  }
-
-  var swithRooms = function(){
-
-  }
-
-  var getUsersInRoom = function(){
-
-  }
-
-  var getMyRoom = function(){
-    
   }
 
 })
+.factory('Refs', function(localStorage){
+
+
+/*
+var rootRef = new Firebase('https://testchatchat.firebaseio.com');
+var usersRef = rootRef.child('users');
+var userNamesRef = usersRef.child('names');
+var userUsersInfoRef = usersRef.child('usersInfo');
+var chatRoom1Ref = rootRef.child('chatRoom1')
+var chatRoom1MessagesRef = chatRoom1Ref.child('messages');
+var chatRoom1UsersRef = chatRoom1Ref.child('users');
+var chatRoom1FavoritesRef = chatRoom1Ref.child('favorites');
+var roomsRef = rootRef.child('rooms');
+var roomNamesRef = roomsRef.child('roomNames');
+var roomRoomsInfoRef = roomsRef.child('roomsInfo');
+
+ref-users-name:
+  ~
+  create data --> 
+    userNamesRef.child('simpleLogin').set('name');
+  ~
+  read data --> 
+    var syncUserNamesRef = $firebaseArray(userNamesRef)
+    userNamesRef.once("value", function(data) {
+      //gives you all of the user's names
+      console.log(data.val());
+    });
+  ~
+  update --> 
+    userNamesRef.child('simpleLogin').set('name');
+  ~
+  destroy -->
+    $firebaseArray(userNamesRef).$remove(key)
+
+
+
+ref-users-usersInfo:
+  ~
+  create data --> 
+    uid-->
+      userUsersInfoRef.child('realName').child('simpleLogin').set('simpleLogin')
+    rooms-->
+      userUsersInfoRef.child('realName').child('rooms').child('roomName').set('roomName')
+  ~
+  read data --> 
+    var syncUserUserInfoRef = $firebaseArray(userUsersInfoRef)
+    userUsersInfoRef.child('realName').child('rooms').once("value", function(data) {
+      //gives you all of the user's names
+      console.log(data.val());
+    });
+  ~
+  update --> 
+    name-->
+      userUsersInfoRef.child('realName').child('simpleLogin').set('simpleLogin')
+    rooms-->
+      userUsersInfoRef.child('realName').child('rooms').child('roomName').set('roomName')
+      
+  ~
+  destroy -->
+    $firebaseArray(userUsersInfoRef.child('-JxpVGLwVtKQnBgd7gw0')).$remove(key)
+
+
+ref-chat1:
+
+  create data -->
+    message-->
+      chat
+      chatRoom1MessagesRef.push({
+        name: $scope.name, 
+        text: $scope.obj.messageText, 
+        timeStamp: ts,
+        musicSource: false
+      });
+    users-->
+      chatRoom1UsersRef.child('simpleLogin1').set('simpleLogin1')
+    favorites -->
+      chatRoom1FavoritesRef.child('realName').push({
+        song : 'song',
+        source: 'source',
+        name: 'name',
+        songData : 'songData'
+      });
+  read data -->
+    var syncChatRoom1Ref = $firebaseArray(chatRoom1Ref)
+
+
+ref-rooms:
+  
+  create data -->
+    room -->
+      roomRoomsInfoRef.child('realRoomName').set('realRoomName');
+    users -->
+      roomRoomsInfoRef.child('realRoomName').child('users').child('simpleLogin1').set('realName')
+    roomNames -->
+      roomNamesRef.child('roomName1').set('roomName1');
+
+  read data -->
+    roomNames -->
+      roomNamesRef.once("value", function(data) {
+        //gives you all of the user's names
+        console.log(data.val());
+      });
+
+    room -->
+      roomRoomsInfoRef.once("value", function(data) {
+        //gives you all of the user's names
+        console.log(data.val());
+      });
+
+*/
+
+
+
+
+})
+
 .controller("ChatCtrl", ["$scope","$firebaseArray", "User", "$state", "$sce", "$http", "$anchorScroll", "$location", "$timeout",
   // we pass our new chatMessages factory into the controller
   function($scope, $firebaseArray, User, $state, $sce, $http, $anchorScroll, $location, $timeout) {
     //get firebase references, such that we can leverage them addmessage, 
-    var obj = User.getRef();
+    var obj = User.getRef(chrome.extension.getBackgroundPage().currentRoom);
 
     //get's the user's name and sets the name to controller
     User.fetchUserObjFromFirebase(function(nameString){
@@ -380,9 +541,7 @@ factory('localStorage', function(){
     });
 
     $scope.name;
-    $scope.messages = $firebaseArray(obj.ref);
-    $scope.youtubeLinks = $firebaseArray(obj.youTubeRef);
-    $scope.soundcloudLinks = $firebaseArray(obj.soundCloudRef);
+    $scope.messages = $firebaseArray(obj.messageRef);
     $scope.favorites = $firebaseArray(obj.favoriteMusicRef);
 
     $scope.messages.$loaded()
@@ -422,7 +581,7 @@ factory('localStorage', function(){
       var ts = new Date();
       ts = ts.toString();
       console.log(val);
-      obj.ref.push({
+      obj.messageRef.push({
         name: $scope.name, 
         text: $scope.obj.messageText, 
         timeStamp: ts,
@@ -548,19 +707,17 @@ factory('localStorage', function(){
       console.log(uri);
       var tarea = uri;
       if (tarea.indexOf("http://")==0 || tarea.indexOf("https://")==0) {
-          chrome.tabs.create({url: uri});
+        chrome.tabs.create({url: uri});
       } else {
         chrome.tabs.create({url: 'http://' + uri});
       }
     }
 
   }])
-//create spotify controller and view, create search engine, displays hits, clicking pushes to FB, add spotify iframe
 
 .controller("RegisterCtrl", ["$scope", "$firebaseArray", "$state", "User",
   function($scope, $firebaseArray, $state, User){
-    var obj = User.getRef();
-
+    
     $scope.obj = {
       loading: false
     }
@@ -620,6 +777,7 @@ factory('localStorage', function(){
         } else {
           User.setAuthObj(authData);
           User.initAuthDependentRef();
+
           $state.go('messages');
         }
       });
@@ -648,7 +806,7 @@ factory('localStorage', function(){
             User.setName(name);
             User.saveUserObjToFirebase();
             soonToBeNamed = '';
-            $state.go('messages');
+            $state.go('hall');
           }
 
         });
@@ -713,6 +871,32 @@ factory('localStorage', function(){
       return $sce.trustAsResourceUrl("https://www.youtube.com/embed/" + src);
     };
 
+
+  }])
+.controller("hallCtrl", ["$scope", "$firebaseArray", "$state", "User", "$sce",
+  function($scope, $firebaseArray, $state, User, $sce){
+    //next: display rooms in hall, once the rootref, map the roomnames, display, and let the user join a room
+    
+    var rootRef = User.getRootRef();
+
+
+    rootRef.once('value', function(data){
+      var rooms = data.val().rooms;
+      console.log(rooms)
+      $scope.rooms = rooms;
+      $scope.$apply();
+    });
+
+
+    $scope.createRoom = function(){
+      User.createRoom($scope.roomName);
+      $scope.roomName = '';
+    }
+
+    $scope.goToRoom = function(room){
+      User.goToRoom(room);
+      $state.go('messages');
+    }
 
   }])
 .directive('emitLastRepeaterElement', function() {
