@@ -105,7 +105,7 @@ var contextMenuHandlerPushSongToFirebase = function(song){
   obj['firebaseRef'] = true;
   chrome.storage.sync.get(obj, function(localStorageObject){
     var ytref = new Firebase(localStorageObject.firebaseRef).child(currentRoom).child('youtube');
-    var chatRef = new Firebase(localStorageObject.firebaseRef).child(currentRoom).child('messages');
+    var chatRef = new Firebase(localStorageObject.firebaseRef).child('rooms').child(currentRoom).child('messages');
 
     var id;
     var ts = new Date();

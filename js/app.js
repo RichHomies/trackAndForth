@@ -1,8 +1,4 @@
-//just created room and saved room name to background page from hall ctrl
-
-//next: display rooms in hall, once the rootref, map the roomnames, display, and let the user join a room
-
-
+//log off button sends user to hall. Fix this.
 var app = angular.module("chatApp", ["firebase", "luegg.directives", 'ui.router', 'ngSanitize'])
 
 .config(function($stateProvider, $urlRouterProvider, $compileProvider){
@@ -23,7 +19,8 @@ var app = angular.module("chatApp", ["firebase", "luegg.directives", 'ui.router'
   })
   .state('signIn', {
     url: "/signIn",
-    templateUrl: "views/signIn.html"
+    templateUrl: "views/signIn.html",
+    controller: "SignInCtrl"
   })
   .state('name', {
     url: "/name",
@@ -53,7 +50,11 @@ var app = angular.module("chatApp", ["firebase", "luegg.directives", 'ui.router'
   $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|chrome-extension):/);
 
 })
-.run(function(User, $state){
+.run(function(User, $state, $rootScope){
+
+$rootScope.$on('$stateChangeError', function (event, toState, toParams, fromState, fromParams, error) {
+  console.log('error ', error);
+});
 
   User.fetchFromLocalStorage(function(localStorageObject){
     chrome.extension.getBackgroundPage().updateIcon('openPopup', function(){
@@ -440,7 +441,11 @@ ref-rooms:
   // we pass our new chatMessages factory into the controller
   function($scope, $firebaseArray, User, $state, $sce, $http, $anchorScroll, $location, $timeout) {
     //get firebase references, such that we can leverage them addmessage, 
-    var obj = User.getRef(chrome.extension.getBackgroundPage().currentRoom);
+    if(chrome.extension.getBackgroundPage().currentRoom !== '') {
+      var obj = User.getRef(chrome.extension.getBackgroundPage().currentRoom);
+    } else {
+      $state.go('hall');
+    }
 
     //get's the user's name and sets the name to controller
     User.fetchUserObjFromFirebase(function(nameString){
@@ -629,12 +634,12 @@ ref-rooms:
       return !isShowing;
     };
 
-    $scope.logOff = function(){
-      $scope.stopSong();
+    $scope.logOff = function(e){
       $state.go('signIn');
-      User.setAuthObj(null);
-      User.setName(null);
-      User.unauth();
+      // $scope.stopSong();
+      // User.setAuthObj(null);
+      // User.setName(null);
+      // User.unauth();
     }
 
     $scope.goToGetFirebaseRef = function(){
@@ -875,7 +880,7 @@ ref-rooms:
   }])
 .controller("hallCtrl", ["$scope", "$firebaseArray", "$state", "User", "$sce",
   function($scope, $firebaseArray, $state, User, $sce){
-    //next: display rooms in hall, once the rootref, map the roomnames, display, and let the user join a room
+
     
     var rootRef = User.getRootRef();
 
