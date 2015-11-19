@@ -52,9 +52,6 @@ var app = angular.module("chatApp", ["firebase", "luegg.directives", 'ui.router'
 })
 .run(function(User, $state, $rootScope){
 
-$rootScope.$on('$stateChangeError', function (event, toState, toParams, fromState, fromParams, error) {
-  console.log('error ', error);
-});
 
   User.fetchFromLocalStorage(function(localStorageObject){
     chrome.extension.getBackgroundPage().updateIcon('openPopup', function(){
@@ -224,7 +221,10 @@ var createRoom = function(rmName){
 }
 
 var goToRoom = function(rmName){
+  var roomRef = rootRef.child('rooms').child(rmName).child('messages');
   chrome.extension.getBackgroundPage().currentRoom = rmName;
+  chrome.extension.getBackgroundPage().setRef(roomRef);
+  chrome.extension.getBackgroundPage().setEvents();
 }
 
 var getRoomName = function(){
@@ -896,10 +896,12 @@ ref-rooms:
     $scope.createRoom = function(){
       User.createRoom($scope.roomName);
       $scope.roomName = '';
+      $state.go('messages');
     }
 
     $scope.goToRoom = function(room){
       User.goToRoom(room);
+
       $state.go('messages');
     }
 
