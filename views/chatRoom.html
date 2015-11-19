@@ -53,9 +53,15 @@
   <div ng-if='obj.loadingComplete'>
 
     <div id='logout'>
-      <button class='btn waves-effect waves-light' type='submit' ng-click='logOff()'>log off
-        <i class='material-icons'></i>
-      </button>
+      <a ui-sref="hall">
+        <button class='btn waves-effect waves-light' type='submit' ng-click='logOff()'>log off
+          <i class='material-icons'></i>
+        </button>
+      </a>
+    </div>
+    
+    <div id='hall'>
+      <a ui-sref="hall">Hall</a>
     </div>
 
     <div align='middle' >
@@ -124,7 +130,7 @@
     </div>
 
     <div ng-if='favorites.length' id='fav'>
-      <a ng-click='showfavorites = !showfavorites' class='waves-effect waves-light btn'>
+      <a ng-click='showfavorites = !showfavorites' class='waves-effect waves-light btn playlistBtn'>
         <i class="large material-icons" ng-model='showfavorites' ng-init='showfavorites = false'>queue_music</i></a>
         <div >
           <div ng-if='showfavorites' scroll-if='showfavorites' id='favorites'>
