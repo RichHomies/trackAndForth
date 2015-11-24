@@ -70,13 +70,13 @@
 
 
     <div id='messagesDiv'>
-      <div ng-repeat='message in messages | orderBy: reverse' emit-last-repeater-element>
+      <div ng-repeat='(key, message) in messages | orderBy: reverse' emit-last-repeater-element>
         <!-- <div class='card-panel word' > -->
 
         <div class='card-panel word chats' ng-click='show = !show'>
           <!-- displays the user name -->
           <strong>{{message.name}} </strong>| {{formatTime(message.timeStamp)}} |
-
+  
           <!-- if the message is text display the user's chat message-->
           <span ng-if='!message.musicSource' ng-bind-html="message.text | linky" ng-click='openTab(message.text)'></span>
           <!-- else, if the message is from youtube, show the youtube player in chat -->
