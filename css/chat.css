@@ -289,7 +289,9 @@ iframe {
   font-size: 14px;
 }
 
-
+.hall {
+  cursor: pointer;        
+}
 
 
 

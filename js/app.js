@@ -78,14 +78,12 @@ var app = angular.module("chatApp", ["firebase", "luegg.directives", 'ui.router'
       } else {
         console.log('invalid firebase reference string, need to set a new reference string');
         $state.go('firebase');       
-      }`
+      }
     } else {
       console.log('run check, fb ref does not exist');
       $state.go('firebase');
     }
   });
-
-
 
 })
 .factory('User', function ($state, $http) {
