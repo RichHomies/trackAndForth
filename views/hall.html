@@ -1,11 +1,11 @@
-<a class="waves-effect waves-light btn-large topBtns">Room</a>
+<a class="waves-effect waves-light btn-large topBtns" ng-click='goToRoom()'>Room</a>
 <a class="waves-effect waves-light btn-large topBtns">Log Out</a>
 <a class="waves-effect waves-light btn createBtn" ui-sref='createRoom'>CREATE A NEW ROOM</a>
 
-<div ng-repeat='(key, room) in rooms'>
+<div class='hall' ng-repeat='(key, room) in rooms' ng-click='goToRoom(key)'>
   <span class='roomName'>{{key}}</span>
   <span ng-repeat='name in room.names' class='rommNames'>
     <span class='roomMembers'>{{name}}</span>
   </span>
-  <i class="material-icons right sendIcon" ng-click='goToRoom(key)'>send</i>
+  <i class="material-icons right sendIcon" >send</i>
 </div>

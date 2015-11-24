@@ -5,8 +5,6 @@ var app = angular.module("chatApp", ["firebase", "luegg.directives", 'ui.router'
 
   $urlRouterProvider.otherwise("/firebase");
 
-
-
   $stateProvider
   .state('home', {
     url: "/",
@@ -52,9 +50,6 @@ var app = angular.module("chatApp", ["firebase", "luegg.directives", 'ui.router'
 })
 .run(function(User, $state, $rootScope){
 
-$rootScope.$on('$stateChangeError', function (event, toState, toParams, fromState, fromParams, error) {
-  console.log('error ', error);
-});
 
   User.fetchFromLocalStorage(function(localStorageObject){
     chrome.extension.getBackgroundPage().updateIcon('openPopup', function(){
@@ -84,14 +79,11 @@ $rootScope.$on('$stateChangeError', function (event, toState, toParams, fromStat
         console.log('invalid firebase reference string, need to set a new reference string');
         $state.go('firebase');       
       }
-
     } else {
       console.log('run check, fb ref does not exist');
       $state.go('firebase');
     }
   });
-
-
 
 })
 .factory('User', function ($state, $http) {
@@ -224,7 +216,11 @@ var createRoom = function(rmName){
 }
 
 var goToRoom = function(rmName){
+  var roomRef = rootRef.child('rooms').child(rmName).child('messages');
+  rootRef.child('rooms').child(rmName).child('names').child(authDataObj.uid).set(name);
   chrome.extension.getBackgroundPage().currentRoom = rmName;
+  chrome.extension.getBackgroundPage().setRef(roomRef);
+  chrome.extension.getBackgroundPage().setEvents();
 }
 
 var getRoomName = function(){
@@ -297,28 +293,6 @@ factory('localStorage', function(){
     fetchFromLocalStorage : fetchFromLocalStorage,
     onChangeInLocalStorage : onChangeInLocalStorage
   };
-
-})
-.factory('Hall', function(){
-    var rootRef;
-    var usersRef;
-    var roomsRef;
-
-  var initApplicationRefs = function(str){
-    rootRef = new Firebase(str);
-    usersRef = rootRef.child('users');
-    roomsRef = rootRef.child('rooms');
-    var rooms = [];
-    roomsRef.child("roomNames").once("value", function(data) {
-      var response = data.val();
-      for(var key in response){
-        rooms.push(key);
-      }
-    });
-
-
-
-  }
 
 })
 .factory('Refs', function(localStorage){
@@ -500,7 +474,7 @@ ref-rooms:
     var scrollToLastChat = function(){
       $timeout(function(){
         var elems = document.getElementsByClassName('chats');
-        var elem = elems[elems.length - 10];
+        var elem = elems[elems.length - 1];
         elem.scrollIntoView();
         console.log('scrolled');
       }, 100);
@@ -580,8 +554,6 @@ ref-rooms:
       return $sce.trustAsResourceUrl(src);
     };
 
-
-
     $scope.addMessage = function(val) {
       var ts = new Date();
       ts = ts.toString();
@@ -595,7 +567,6 @@ ref-rooms:
 
       $scope.obj.messageText = "";
       scrollToLastChat();
-
     };
 
     $scope.remove = function(url, yt, sc, fav){
@@ -636,10 +607,10 @@ ref-rooms:
 
     $scope.logOff = function(e){
       $state.go('signIn');
-      // $scope.stopSong();
-      // User.setAuthObj(null);
-      // User.setName(null);
-      // User.unauth();
+      $scope.stopSong();
+      User.setAuthObj(null);
+      User.setName(null);
+      User.unauth();
     }
 
     $scope.goToGetFirebaseRef = function(){
@@ -711,7 +682,7 @@ ref-rooms:
     $scope.openTab = function (uri){
       console.log(uri);
       var tarea = uri;
-      if (tarea.indexOf("http://")==0 || tarea.indexOf("https://")==0) {
+      if (tarea.indexOf("http://") === 0 || tarea.indexOf("https://")=== 0) {
         chrome.tabs.create({url: uri});
       } else {
         chrome.tabs.create({url: 'http://' + uri});
@@ -896,10 +867,12 @@ ref-rooms:
     $scope.createRoom = function(){
       User.createRoom($scope.roomName);
       $scope.roomName = '';
+      $state.go('messages');
     }
 
     $scope.goToRoom = function(room){
-      User.goToRoom(room);
+      var roomName = room || chrome.extension.getBackgroundPage().currentRoom;
+      User.goToRoom(roomName);
       $state.go('messages');
     }
 
@@ -921,8 +894,6 @@ ref-rooms:
     });
   }
 });
-
-
 
 
 
