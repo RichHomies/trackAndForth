@@ -42,13 +42,13 @@ var updateIcon = function (type, cb){
 
   var iconPaths = {
     'playingSong' : 'assets/audio.png',
-    'newMessage' : 'assets/diamond_red.png',
-    'default' : 'assets/diamond.png',
+    'newMessage' : 'assets/16by16logo.png',
+    'default' : 'assets/16by16logoDark.png',
     'playingSongNewMessage' : 'assets/audio_red.png',
-    'stopPlayingSong' : 'assets/diamond.png',
-    'endedSong' : 'assets/diamond.png',
-    'pausePlayingSong' : 'assets/diamond.png',
-    'openPopup' : 'assets/diamond.png'
+    'stopPlayingSong' : 'assets/16by16logoDark.png',
+    'endedSong' : 'assets/16by16logoDark.png',
+    'pausePlayingSong' : 'assets/16by16logoDark.png',
+    'openPopup' : 'assets/16by16logoDark.png'
   }
 
   chrome.browserAction.setIcon({path: iconPaths[type]}, function(){

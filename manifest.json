@@ -5,7 +5,7 @@
   "version": "1.0",
   "content_security_policy": "script-src 'self' https://cdn.firebase.com https://*.firebaseio.com https://api.soundcloud.com; object-src 'self'", 
   "browser_action": {
-    "default_icon": "assets/diamond.png",
+    "default_icon": "assets/16by16logoDark.png",
     "default_popup": "index.html",
     "default_title": "Chattin' N' Shit"
   },
@@ -24,7 +24,9 @@
     "persistent": true
   },
   "icons": {
-        "16": "assets/diamond.png"
+        "16": "assets/16by16logoDark.png",
+        "48": "assets/48by48logo.png",
+        "128": "assets/128by128logo.png"
   },
   "version": "2.0"
 

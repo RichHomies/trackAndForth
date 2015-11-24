@@ -27,7 +27,9 @@
     "karma-jasmine": "~0.3.6",
     "karma-chrome-launcher": "~0.2.0",
     "angular-mocks": "~1.4.3",
-    "expect.js": "~0.3.1"
+    "expect.js": "~0.3.1",
+    "angular-ui-event": "~1.0.0",
+    "angular-sanitize": "~1.4.7"
   },
   "devDependencies": {
     "karma-jasmine": "~0.3.6"
