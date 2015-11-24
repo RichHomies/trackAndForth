@@ -871,8 +871,8 @@ ref-rooms:
     }
 
     $scope.goToRoom = function(room){
-      User.goToRoom(room);
-
+      var roomName = room || chrome.extension.getBackgroundPage().currentRoom;
+      User.goToRoom(roomName);
       $state.go('messages');
     }
 
